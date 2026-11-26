@@ -335,11 +335,12 @@ def verify_pin_role(role, pin):
     if not role or not pin:
         return False
     conn = db.get_db()
-    user = conn.execute("SELECT * FROM users WHERE role = ?", (str(role).lower(),)).fetchone()
+    user = conn.execute(
+        "SELECT id FROM users WHERE role = ? AND pin_hash = ? AND (is_active = 1 OR is_active IS NULL)",
+        (str(role).lower(), db.hash_pin(pin))
+    ).fetchone()
     conn.close()
-    if user and user['pin_hash'] == db.hash_pin(pin):
-        return True
-    return False
+    return user is not None
 
 def get_request_role():
     # 1. Check isolated station headers (per-window sessionStorage)
