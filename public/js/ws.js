@@ -21,26 +21,14 @@
     } else if (pin === '3333') {
       sessionStorage.setItem('station_role', 'service');
     }
-  } else {
-    // When navigating to a specific station page, synchronize the station role
-    if (path.includes('/kitchen')) {
-      sessionStorage.setItem('station_role', 'kitchen');
-      sessionStorage.setItem('station_pin', '2222');
-    } else if (path.includes('/service')) {
-      sessionStorage.setItem('station_role', 'service');
-      sessionStorage.setItem('station_pin', '3333');
-    } else if (path.includes('/settings') || path.includes('/pos') || path === '/' || path.includes('/launch')) {
-      sessionStorage.setItem('station_role', 'manager');
-      sessionStorage.setItem('station_pin', '1234');
-    }
   }
 
-  // Intercept fetch to add station headers
+  // Intercept fetch to add station headers only when isolated window PIN is active
   const originalFetch = window.fetch;
   window.fetch = function(url, options = {}) {
     options.headers = options.headers || {};
-    const role = sessionStorage.getItem('station_role') || 'manager';
-    const pinVal = sessionStorage.getItem('station_pin') || '1234';
+    const role = sessionStorage.getItem('station_role');
+    const pinVal = sessionStorage.getItem('station_pin');
 
     if (role && pinVal) {
       if (options.headers instanceof Headers) {
@@ -60,11 +48,9 @@ function applyRoleHierarchyNavigation() {
   const path = window.location.pathname;
   let role = sessionStorage.getItem('station_role') || 'manager';
 
-  // Ensure role matches page context if on manager routes
+  // Ensure role matches page context for sidebar display
   if (path.includes('/settings') || path.includes('/pos') || path === '/' || path.includes('/launch')) {
     role = 'manager';
-    sessionStorage.setItem('station_role', 'manager');
-    sessionStorage.setItem('station_pin', '1234');
   } else if (path.includes('/kitchen')) {
     role = 'kitchen';
   } else if (path.includes('/service')) {

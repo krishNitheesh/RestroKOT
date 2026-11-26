@@ -575,13 +575,25 @@ def delete_captain_endpoint(user_id):
 
 @app.route('/favicon.ico')
 def favicon():
-    return Response(status=204)
+    return send_from_directory(PUBLIC_DIR, 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 @app.route('/')
 def index_page():
-    return send_from_directory(PUBLIC_DIR, 'pos.html')
+    role = get_request_role()
+    if role == 'owner':
+        return redirect('/owner')
+    elif role == 'kitchen':
+        return redirect('/kitchen')
+    elif role == 'service':
+        return redirect('/service')
+    elif role == 'captain':
+        return redirect('/captain')
+    elif role == 'manager':
+        return redirect('/pos')
+    return redirect('/login')
 
 @app.route('/launch')
+@login_required(allowed_roles=['manager', 'owner'])
 def launch_page():
     return send_from_directory(PUBLIC_DIR, 'launch.html')
 
@@ -590,19 +602,23 @@ def login_page():
     return send_from_directory(PUBLIC_DIR, 'login.html')
 
 @app.route('/pos')
+@login_required(allowed_roles=['manager'])
 def pos_page():
     return send_from_directory(PUBLIC_DIR, 'pos.html')
 
 @app.route('/kitchen')
+@login_required(allowed_roles=['manager', 'kitchen'])
 def kitchen_page():
     return send_from_directory(PUBLIC_DIR, 'kitchen.html')
 
 @app.route('/service')
+@login_required(allowed_roles=['manager', 'service'])
 def service_page():
     return send_from_directory(PUBLIC_DIR, 'service.html')
 
 @app.route('/captain')
 @app.route('/waiter')
+@login_required(allowed_roles=['manager', 'service', 'captain'])
 def captain_page():
     return send_from_directory(PUBLIC_DIR, 'captain.html')
 
@@ -619,10 +635,12 @@ def tv2_page():
     return send_from_directory(PUBLIC_DIR, 'display.html')
 
 @app.route('/settings')
+@login_required(allowed_roles=['manager', 'owner'])
 def settings_page():
     return send_from_directory(PUBLIC_DIR, 'settings.html')
 
 @app.route('/owner')
+@login_required(allowed_roles=['manager', 'owner'])
 def owner_page():
     return send_from_directory(PUBLIC_DIR, 'owner.html')
 

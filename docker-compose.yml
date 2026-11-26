@@ -1,0 +1,13 @@
+services:
+  restrokot:
+    build: .
+    container_name: restrokot-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SECRET_KEY=${SECRET_KEY:-restrokot-prod-secret-change-me}
+      - RESTROKOT_DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
