@@ -15,9 +15,16 @@ import db
 
 
 def setup_logging():
-    """Log desktop runner output to persistent data directory (critical when console=False in .exe)."""
+    """Log desktop runner output to persistent data directory (and fix None stdout/stderr in Windows console=False .exe)."""
     os.makedirs(db.DB_DIR, exist_ok=True)
     log_path = os.path.join(db.DB_DIR, 'restrokot_desktop.log')
+
+    # Crucial for PyInstaller console=False on Windows where sys.stdout / sys.stderr are None
+    if sys.stdout is None:
+        sys.stdout = open(log_path, 'a', encoding='utf-8', buffering=1)
+    if sys.stderr is None:
+        sys.stderr = open(log_path, 'a', encoding='utf-8', buffering=1)
+
     logging.basicConfig(
         level=logging.INFO,
         format='%(asctime)s [%(levelname)s] %(message)s',
@@ -26,6 +33,16 @@ def setup_logging():
             logging.StreamHandler(sys.stdout)
         ]
     )
+
+
+def show_windows_error(title: str, message: str):
+    """Show a visible Windows alert dialog if startup fails in console=False mode."""
+    if sys.platform == 'win32':
+        try:
+            import ctypes
+            ctypes.windll.user32.MessageBoxW(0, message, title, 0x10)
+        except Exception:
+            pass
 
 
 def is_port_in_use(port: int) -> bool:
@@ -86,6 +103,10 @@ def main():
         t.start()
         if not wait_for_server(port, timeout=15.0):
             logging.error("Timed out waiting for RestroKOT server to bind port 3000.")
+            show_windows_error(
+                "RestroKOT Startup Error",
+                f"Could not start RestroKOT server on port {port}.\n\nCheck log file:\n{os.path.join(db.DB_DIR, 'restrokot_desktop.log')}"
+            )
     else:
         logging.info(f"RestroKOT server is already active on port {port} (reusing existing instance).")
 
@@ -112,7 +133,9 @@ def main():
     except Exception as e:
         logging.warning(f"pywebview unavailable or failed ({e}). Falling back to Edge App Mode / browser...")
         if sys.platform == 'win32':
-            os.system(f'start msedge --app="{target_url}"')
+            rc = os.system(f'start "" msedge --app="{target_url}"')
+            if rc != 0:
+                webbrowser.open(target_url)
         else:
             webbrowser.open(target_url)
 
