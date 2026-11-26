@@ -2,6 +2,7 @@
 # PyInstaller Spec file for RestroKOT Windows Desktop Application (Folder Mode - Fast Launch)
 
 import os
+from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 
@@ -21,7 +22,7 @@ hiddenimports = [
     'webview',
     'clr',
     'pythonnet',
-]
+] + collect_submodules('webview')
 
 a = Analysis(
     ['desktop_app.py'],

@@ -109,8 +109,8 @@ def main():
         )
         webview.start()
         logging.info("RestroKOT window closed by user.")
-    except ImportError:
-        logging.warning("pywebview not installed. Falling back to Edge App Mode / browser...")
+    except Exception as e:
+        logging.warning(f"pywebview unavailable or failed ({e}). Falling back to Edge App Mode / browser...")
         if sys.platform == 'win32':
             os.system(f'start msedge --app="{target_url}"')
         else:

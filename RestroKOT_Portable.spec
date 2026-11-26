@@ -2,6 +2,7 @@
 # PyInstaller Spec file for RestroKOT Single-File Portable Windows Executable (RestroKOT_Portable.exe)
 
 import os
+from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 
@@ -20,7 +21,7 @@ hiddenimports = [
     'webview',
     'clr',
     'pythonnet',
-]
+] + collect_submodules('webview')
 
 a = Analysis(
     ['desktop_app.py'],
