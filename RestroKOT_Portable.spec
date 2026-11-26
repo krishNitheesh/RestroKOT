@@ -60,5 +60,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='public/favicon.ico' if os.path.exists('public/favicon.ico') else None,
+    icon='public/favicon.ico' if (os.path.exists('public/favicon.ico') and os.path.getsize('public/favicon.ico') > 0) else None,
 )
