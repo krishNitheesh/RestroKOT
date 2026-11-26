@@ -36,3 +36,4 @@ jobs:
           path: |
             dist/RestroKOT_Portable.exe
             dist/RestroKOT/
+            Allow_WiFi_Devices.bat

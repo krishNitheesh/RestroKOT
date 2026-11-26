@@ -2205,3 +2205,138 @@ body.kds-tv-mode .restro-top-bar {
 .btn-subtab:hover {
   color: #ea580c !important;
 }
+
+/* =========================================================
+   MULTI-DEVICE RESPONSIVENESS (Phones, Tablets, Small Laptops)
+   ========================================================= */
+.mobile-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  background: #ffffff;
+  color: #0f172a;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: 0.5rem;
+}
+.mobile-menu-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+.mobile-nav-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(2px);
+  z-index: 990;
+}
+body.mobile-nav-open .mobile-nav-backdrop {
+  display: block;
+}
+
+/* Tablets & Small Laptops (<= 1100px) */
+@media (max-width: 1100px) {
+  .restro-cart-panel {
+    width: 315px;
+  }
+}
+
+/* Tablets & Phones: Slide-over Sidebar Drawer (<= 1024px) */
+@media (max-width: 1024px) {
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
+  .restro-sidebar {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    left: -270px;
+    bottom: 0;
+    width: 250px;
+    z-index: 1000;
+    transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: none;
+  }
+  body.mobile-nav-open .restro-sidebar {
+    left: 0;
+    box-shadow: 10px 0 35px rgba(15, 23, 42, 0.22);
+  }
+  .restro-main {
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+
+/* Mobile & Small Tablets (<= 768px): Stack POS/Captain Cart below Menu */
+@media (max-width: 768px) {
+  .restro-container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .restro-main {
+    flex: none;
+    width: 100% !important;
+    overflow: visible;
+  }
+  .restro-pos-content {
+    overflow: visible;
+    padding: 0.9rem;
+  }
+  .restro-top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    padding: 0.5rem 0.75rem;
+    height: auto;
+    min-height: 52px;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+  .restro-cart-panel {
+    width: 100% !important;
+    border-left: none;
+    border-top: 2px solid #e2e8f0;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+    overflow: visible;
+    flex-shrink: 0;
+  }
+  .restro-cart-items-scroll {
+    max-height: 42vh;
+  }
+  .restro-menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)) !important;
+    gap: 0.75rem;
+  }
+  .restro-tables-grid {
+    grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)) !important;
+    gap: 0.75rem;
+  }
+  .restro-filters-bar {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .restro-filter-select {
+    width: 100%;
+  }
+  .modal-box {
+    width: 94vw !important;
+    max-width: 94vw !important;
+    max-height: 90vh;
+    overflow-y: auto;
+    margin: 0.5rem;
+  }
+  .restro-table-modern th,
+  .restro-table-modern td {
+    padding: 0.65rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}

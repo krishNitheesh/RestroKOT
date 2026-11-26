@@ -116,11 +116,54 @@ function applyRoleHierarchyNavigation() {
   }
 }
 
+function initResponsiveMobileNav() {
+  const sidebar = document.querySelector('.restro-sidebar');
+  const topBar = document.querySelector('.restro-top-bar');
+  if (!sidebar || !topBar) return;
+
+  // Create backdrop once
+  let backdrop = document.querySelector('.mobile-nav-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.className = 'mobile-nav-backdrop';
+    backdrop.addEventListener('click', () => document.body.classList.remove('mobile-nav-open'));
+    document.body.appendChild(backdrop);
+  }
+
+  // Inject hamburger button at left of top bar if not already present
+  if (!topBar.querySelector('.mobile-menu-btn')) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'mobile-menu-btn';
+    btn.title = 'Open Navigation Menu';
+    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`;
+    btn.addEventListener('click', () => document.body.classList.toggle('mobile-nav-open'));
+
+    const firstChild = topBar.firstElementChild;
+    if (firstChild) {
+      firstChild.style.display = 'flex';
+      firstChild.style.alignItems = 'center';
+      firstChild.insertBefore(btn, firstChild.firstChild);
+    } else {
+      topBar.appendChild(btn);
+    }
+  }
+
+  // Close drawer when clicking any nav link on mobile
+  sidebar.querySelectorAll('a.restro-nav-link').forEach(link => {
+    link.addEventListener('click', () => document.body.classList.remove('mobile-nav-open'));
+  });
+}
+
 if (typeof document !== 'undefined') {
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', applyRoleHierarchyNavigation);
+    document.addEventListener('DOMContentLoaded', () => {
+      applyRoleHierarchyNavigation();
+      initResponsiveMobileNav();
+    });
   } else {
     applyRoleHierarchyNavigation();
+    initResponsiveMobileNav();
   }
 }
 window.applyRoleHierarchyNavigation = applyRoleHierarchyNavigation;

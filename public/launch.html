@@ -143,8 +143,8 @@
         <!-- Title Row with 1-Click Launch Button -->
         <div class="restro-pos-title-bar">
           <div>
-            <h1 class="restro-title">Multi-Monitor Station Launcher</h1>
-            <div class="restro-breadcrumb">Single System • Multi-Screen Kiosk Mode • Isolated Station Sessions</div>
+            <h1 class="restro-title">Multi-Monitor & Multi-Device Hub</h1>
+            <div class="restro-breadcrumb">Open portals on this PC or any Phone, Tablet, Kitchen Screen & Smart TV on Wi-Fi</div>
           </div>
 
           <div class="restro-actions-group">
@@ -152,6 +152,34 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               <span>Launch All 5 Station Windows</span>
             </button>
+          </div>
+        </div>
+
+        <!-- Multi-System Wi-Fi / LAN Access Card -->
+        <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 18px; padding: 1.5rem; color: #fff; box-shadow: 0 6px 24px rgba(15, 23, 42, 0.14);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <div>
+              <div style="display: inline-flex; align-items: center; gap: 0.45rem; background: rgba(34, 197, 94, 0.16); border: 1px solid rgba(34, 197, 94, 0.35); color: #4ade80; padding: 0.25rem 0.7rem; border-radius: 20px; font-size: 0.78rem; font-weight: 700; margin-bottom: 0.5rem;">
+                <span style="display: inline-block; width: 7px; height: 7px; background: #22c55e; border-radius: 50%;"></span>
+                <span>Wi-Fi / LAN Multi-System Access Ready</span>
+              </div>
+              <h2 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0 0 0.25rem 0;">Connect Other Devices (Phones, Tablets, Kitchen & TVs)</h2>
+              <p style="font-size: 0.84rem; color: #94a3b8; margin: 0;">
+                Make sure the other phone/tablet/PC is on the <strong>same Wi-Fi network</strong>, then open its portal URL below in Chrome or Safari.
+              </p>
+            </div>
+            <div style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 0.65rem 1rem;">
+              <div style="font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; font-weight: 700;">Main Server Address</div>
+              <div id="lan-base-url" style="font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 800; color: #38bdf8;">Detecting...</div>
+            </div>
+          </div>
+
+          <div id="lan-portals-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.75rem;">
+            <!-- Populated dynamically via /api/network-info -->
+          </div>
+
+          <div style="margin-top: 1rem; font-size: 0.78rem; color: #cbd5e1; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 0.65rem 0.9rem;">
+            <strong>Windows Firewall Tip:</strong> If another device on Wi-Fi cannot open the link, run <code>Allow_WiFi_Devices.bat</code> as Administrator on the main Windows POS PC (one-time setup for ports 3000 &amp; 3001).
           </div>
         </div>
 
@@ -291,6 +319,57 @@
       setTimeout(() => openStationWindow('/display?station=counter', 'Takeaway_TV_Win', 1280, 800), 800);
       showToast('Opening all 5 station windows. Drag each window to its monitor!', 'success');
     }
+
+    async function loadNetworkPortals() {
+      try {
+        const res = await fetch('/api/network-info');
+        const data = await res.json();
+        if (!data.success) return;
+
+        const baseEl = document.getElementById('lan-base-url');
+        if (baseEl) baseEl.textContent = data.base_url;
+
+        const grid = document.getElementById('lan-portals-grid');
+        if (!grid) return;
+
+        grid.innerHTML = (data.portals || []).map(p => `
+          <div style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 0.85rem; display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
+              <span style="font-weight: 800; font-size: 0.92rem; color: #fff;">${p.name}</span>
+              <span style="font-size: 0.7rem; font-weight: 700; color: #fbbf24; background: rgba(251,191,36,0.15); padding: 2px 7px; border-radius: 6px;">${p.pin}</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">${p.device}</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #38bdf8; word-break: break-all; background: rgba(0,0,0,0.25); padding: 0.35rem 0.5rem; border-radius: 6px;">
+              ${p.url}
+            </div>
+            <div style="display: flex; gap: 0.45rem; margin-top: 0.25rem;">
+              <button type="button" onclick="copyPortalUrl('${p.url}', this)" style="flex: 1; background: #2563eb; color: #fff; border: none; border-radius: 7px; padding: 0.4rem 0.6rem; font-size: 0.76rem; font-weight: 700; cursor: pointer;">
+                Copy Link
+              </button>
+              <a href="${p.path}" target="_blank" style="background: rgba(255,255,255,0.12); color: #fff; text-decoration: none; border-radius: 7px; padding: 0.4rem 0.7rem; font-size: 0.76rem; font-weight: 700; display: inline-flex; align-items: center;">
+                Open ↗
+              </a>
+            </div>
+          </div>
+        `).join('');
+      } catch (e) {
+        console.error('loadNetworkPortals error:', e);
+      }
+    }
+
+    function copyPortalUrl(url, btn) {
+      navigator.clipboard.writeText(url).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        btn.style.background = '#16a34a';
+        setTimeout(() => {
+          btn.textContent = orig;
+          btn.style.background = '#2563eb';
+        }, 1500);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadNetworkPortals);
   </script>
 </body>
 </html>

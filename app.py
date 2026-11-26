@@ -2974,6 +2974,30 @@ def get_local_ip():
         return '127.0.0.1'
 
 
+@app.route('/api/network-info', methods=['GET'])
+def get_network_info():
+    """Return LAN IP and clickable URLs for accessing all portals from other devices on Wi-Fi."""
+    port = int(os.environ.get('PORT', 3000))
+    lan_ip = get_local_ip()
+    base_url = f"http://{lan_ip}:{port}"
+    return jsonify({
+        'success': True,
+        'lan_ip': lan_ip,
+        'port': port,
+        'base_url': base_url,
+        'portals': [
+            {'id': 'pos', 'name': 'Manager POS', 'path': '/pos', 'url': f'{base_url}/pos', 'pin': '1234', 'device': 'Main Billing PC / Laptop'},
+            {'id': 'captain', 'name': 'Captain Mobile', 'path': '/captain', 'url': f'{base_url}/captain', 'pin': 'Captain PIN', 'device': 'Waiter Phones & Tablets'},
+            {'id': 'kitchen', 'name': 'Kitchen KDS', 'path': '/kitchen', 'url': f'{base_url}/kitchen', 'pin': '2222', 'device': 'Kitchen Tablet / TV'},
+            {'id': 'service', 'name': 'Service Expediter', 'path': '/service', 'url': f'{base_url}/service', 'pin': '3333', 'device': 'Pickup Counter PC / Tablet'},
+            {'id': 'display1', 'name': 'Customer TV 1', 'path': '/display', 'url': f'{base_url}/display', 'pin': 'Public', 'device': 'Dining Hall Smart TV'},
+            {'id': 'display2', 'name': 'Takeaway TV 2', 'path': '/display?station=counter', 'url': f'{base_url}/display?station=counter', 'pin': 'Public', 'device': 'Counter Queue TV'},
+            {'id': 'owner', 'name': 'Owner Live Desk', 'path': '/owner', 'url': f'{base_url}/owner', 'pin': 'Owner PIN', 'device': 'Owner Phone / Laptop'},
+            {'id': 'settings', 'name': 'Settings & Cloud', 'path': '/settings', 'url': f'{base_url}/settings', 'pin': '1234', 'device': 'Manager PC / Laptop'},
+        ]
+    })
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 3000))
     intercom_port = int(os.environ.get('INTERCOM_PORT', 3001))
