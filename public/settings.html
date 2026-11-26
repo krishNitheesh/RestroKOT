@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings & Dishes Manager | Grand Palace KOT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3.5">
+  <style>
+    .settings-card-modern, .restro-card-modern {
+      background: #ffffff;
+      border: 1.5px solid #edf2f7;
+      border-radius: 18px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+    .restro-card-head {
+      margin-bottom: 1.25rem;
+    }
+    .restro-card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .restro-card-subtitle {
+      font-size: 0.82rem;
+      color: #64748b;
+      margin-top: 0.2rem;
+    }
+    .form-grid-modern {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+    .form-group-modern {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+    .form-group-modern label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+    .form-group-modern input, .form-group-modern select {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.65rem 0.95rem;
+      color: #0f172a;
+      font-size: 0.9rem;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+    .form-group-modern input:focus, .form-group-modern select:focus {
+      background: #ffffff;
+      border-color: #ea580c;
+      box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1);
+    }
+    .restro-table-modern {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.88rem;
+    }
+    .restro-table-modern th {
+      background: #f8fafc;
+      text-align: left;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #edf2f7;
+      color: #64748b;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .restro-table-modern td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
+    }
+    .restro-table-modern tr:hover {
+      background: #fbfcfd;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fullscreen RestroBit Container -->
+  <div class="restro-container">
+
+    <!-- 1. Left Sidebar Navigation -->
+    <aside class="restro-sidebar">
+      <div>
+        <!-- Brand Header -->
+        <div class="restro-brand">
+          <div class="restro-brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <div class="restro-brand-title">RestroKOT</div>
+            <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Restaurant Suite</div>
+          </div>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="restro-user-card">
+          <div class="restro-avatar">M</div>
+          <div style="overflow: hidden;">
+            <div class="restro-user-title" style="font-size: 0.85rem; font-weight: 800; color: #0f172a; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Manager Desk</div>
+            <div class="restro-user-subtitle" style="font-size: 0.72rem; color: #16a34a; font-weight: 700;">● Station Manager</div>
+          </div>
+        </div>
+
+        <!-- Main Navigation Links -->
+        <nav>
+          <div class="restro-nav-group" data-roles="manager">
+            <div class="restro-nav-header">POS & Floor</div>
+            <a href="/pos" class="restro-nav-link">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
+              <span>Point of Sale (POS)</span>
+            </a>
+            <a href="/pos" class="restro-nav-link">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              <span>Dining Tables Floor</span>
+            </a>
+          </div>
+
+          <!-- Station Terminals Navigation -->
+          <div class="restro-nav-group">
+            <div class="restro-nav-header">Terminals & Displays</div>
+            <a href="/captain" class="restro-nav-link" data-roles="manager,service,captain">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Captain Order Desk</span>
+            </a>
+            <a href="/kitchen" class="restro-nav-link" data-roles="manager,kitchen">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Kitchen KDS</span>
+            </a>
+            <a href="/service" class="restro-nav-link" data-roles="manager,service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <span>Service Area</span>
+            </a>
+            <a href="/display" target="_blank" class="restro-nav-link" data-roles="manager,kitchen,service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              <span>Customer TV 1</span>
+            </a>
+            <a href="/display?station=counter" target="_blank" class="restro-nav-link" data-roles="manager,kitchen,service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              <span>Takeaway TV 2</span>
+            </a>
+          </div>
+
+          <!-- Back Office Navigation (Manager Only) -->
+          <div class="restro-nav-group" data-roles="manager">
+            <div class="restro-nav-header">Management</div>
+            <a href="/owner" class="restro-nav-link" data-roles="manager,owner">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>Owner Desk</span>
+            </a>
+            <a href="/settings#tab-menu" class="restro-nav-link active" id="nav-dishes">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"/><path d="m14 2 2 4v16"/><path d="M2 15a4 4 0 0 0 8 0V2H2v13Z"/></svg>
+              <span>Dishes & Menu</span>
+            </a>
+            <a href="/launch" class="restro-nav-link">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Multi-Monitor Kiosk</span>
+            </a>
+            <a href="/settings#tab-gst" class="restro-nav-link" id="nav-settings">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Tax & Settings</span>
+            </a>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Staff Logout -->
+      <div>
+        <button class="restro-nav-link" onclick="logoutUser()" style="width: 100%; border: none; cursor: pointer; background: transparent; color: #ef4444;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Staff Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 2. Main Content Center Panel -->
+    <main class="restro-main">
+
+      <!-- Top Universal Header -->
+      <header class="restro-top-bar">
+        <div style="display: flex; align-items: center; gap: 0.5rem; color: #64748b; font-size: 0.88rem; font-weight: 700;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span>Administration & Catalog Console</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="live-pill ws-status-pill"><span class="dot-pulse"></span> Instant Sync (0ms)</span>
+          <span class="user-role-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Manager Only
+          </span>
+        </div>
+      </header>
+
+      <!-- Main Settings Content -->
+      <div class="restro-pos-content">
+
+        <!-- Title Row -->
+        <div class="restro-pos-title-bar">
+          <div>
+            <h1 class="restro-title">Settings & Dishes Manager</h1>
+            <div class="restro-breadcrumb">Dashboard • Menu Dishes, Dining Tables, GST Rates & Staff Security PINs</div>
+          </div>
+        </div>
+
+        <!-- RestroBit Navigation Pills (Tabs) -->
+        <div class="restro-category-pills" id="settings-pills">
+          <button class="restro-pill active" data-tab="tab-menu">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"/><path d="m14 2 2 4v16"/><path d="M2 15a4 4 0 0 0 8 0V2H2v13Z"/></svg>
+            <span>Dishes & Menu</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-categories">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+            <span>Food Categories</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-tables">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+            <span>Dining Tables Floor</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-gst">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+            <span>GST Rates & Taxation</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-profile">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Restaurant Profile</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-pins">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Staff Security PINs</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-reports">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+            <span>Daily Sales & Bills</span>
+          </button>
+          <button class="restro-pill" data-tab="tab-cloud">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+            <span>Cloud Backup & Sync</span>
+          </button>
+        </div>
+
+        <!-- TAB 1: Menu & Dishes Management -->
+        <div id="tab-menu" class="tab-pane">
+          <div class="settings-card-modern">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h3 style="font-size: 1.2rem; color: #0f172a; font-weight: 800; margin-bottom: 0.25rem;">Dishes & Catalog Management</h3>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                  Add new dishes, edit pricing, delete items, or toggle <strong>86 (Out of Stock)</strong> in real time.
+                </p>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-secondary btn-sm" onclick="clearAllDishes()" title="Clear all dishes" style="color: #dc2626; border-color: #fca5a5;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                  Clear All Dishes
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="seedSampleMenu()" title="Load sample dishes">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  ✨ Load Sample Menu
+                </button>
+                <button class="btn btn-secondary btn-sm" onclick="openAddCategoryModal()" style="color: #ea580c; border-color: #fed7aa; background: #fff7ed; font-weight: 700;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+                  + Add Category
+                </button>
+                <button class="btn-restro-orange" onclick="openAddItemModal()" style="font-size: 0.85rem; padding: 0.45rem 0.95rem;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                  + Add New Dish
+                </button>
+              </div>
+            </div>
+
+            <!-- Filters Bar -->
+            <div class="restro-filters-bar" style="margin-bottom: 1rem;">
+              <div style="position: relative; flex: 1;">
+                <input type="text" id="menu-mgmt-search" class="restro-filter-input" placeholder="Filter dishes by name..." oninput="filterMenuTable()">
+                <span style="position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: #94a3b8; display: flex;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </span>
+              </div>
+              <select id="menu-mgmt-cat-filter" class="restro-filter-select" onchange="filterMenuTable()">
+                <option value="all">All Categories</option>
+              </select>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="restro-table-modern">
+                <thead>
+                  <tr>
+                    <th>Dish Name</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Price (₹)</th>
+                    <th>Availability</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="menu-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Categories Management -->
+        <div id="tab-categories" class="tab-pane hidden">
+          <div class="settings-card-modern">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h3 style="font-size: 1.2rem; color: #0f172a; font-weight: 800; margin-bottom: 0.25rem;">Food Categories & Groups</h3>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                  Organize dishes into menu sections (e.g., Starters, Main Course, Biryanis, Desserts, Beverages).
+                </p>
+              </div>
+              <div>
+                <button class="btn-restro-orange" onclick="openAddCategoryModal()" style="font-size: 0.85rem; padding: 0.45rem 0.95rem;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                  + Add New Category
+                </button>
+              </div>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="restro-table-modern">
+                <thead>
+                  <tr>
+                    <th style="width: 70px;">Icon</th>
+                    <th>Category Name</th>
+                    <th>Code Identifier</th>
+                    <th>Sort Order</th>
+                    <th>Dishes Count</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: Dining Tables Floor Management -->
+        <div id="tab-tables" class="tab-pane hidden">
+          <div class="settings-card-modern">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <h3 style="font-size: 1.2rem; color: #0f172a; font-weight: 800; margin-bottom: 0.25rem;">Dining Tables Floor</h3>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                  Configure restaurant tables, seating capacities, sections, or remove inactive tables.
+                </p>
+              </div>
+              <button class="btn-restro-orange" onclick="openAddTableSettingsModal()" style="font-size: 0.85rem; padding: 0.45rem 0.95rem;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                + Add New Table
+              </button>
+            </div>
+
+            <div style="overflow-x: auto;">
+              <table class="restro-table-modern" id="settings-tables-table">
+                <thead>
+                  <tr>
+                    <th>Table Name</th>
+                    <th>Section / Floor</th>
+                    <th>Capacity</th>
+                    <th>Occupancy Status</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="settings-tables-tbody">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: GST & Taxation -->
+        <div id="tab-gst" class="tab-pane hidden">
+          <div class="settings-card-modern">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem;">GST Rates & Taxation</h3>
+            <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 1.5rem;">
+              Configure Indian GST rates (CGST & SGST), GSTIN and FSSAI license numbers printed on thermal invoices.
+            </p>
+
+            <form id="form-gst" onsubmit="saveGST(event)">
+              <div class="form-grid-modern">
+                <div class="form-group-modern">
+                  <label>CGST Rate (%)</label>
+                  <input type="number" step="0.1" id="cfg-cgst_rate" required>
+                </div>
+                <div class="form-group-modern">
+                  <label>SGST Rate (%)</label>
+                  <input type="number" step="0.1" id="cfg-sgst_rate" required>
+                </div>
+                <div class="form-group-modern">
+                  <label>GSTIN Number</label>
+                  <input type="text" id="cfg-gstin" required>
+                </div>
+                <div class="form-group-modern">
+                  <label>FSSAI License No.</label>
+                  <input type="text" id="cfg-fssai" required>
+                </div>
+              </div>
+              <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn-restro-orange" style="padding: 0.65rem 1.4rem;">Save GST Configuration</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 4: Restaurant Profile -->
+        <div id="tab-profile" class="tab-pane hidden">
+          <div class="settings-card-modern">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem;">Restaurant Profile</h3>
+            <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 1.5rem;">
+              Printed at the top of 80mm thermal receipts and displayed on customer TV screens.
+            </p>
+
+            <form id="form-profile" onsubmit="saveProfile(event)">
+              <div class="form-grid-modern">
+                <div class="form-group-modern">
+                  <label>Restaurant Name</label>
+                  <input type="text" id="cfg-restaurant_name" required>
+                </div>
+                <div class="form-group-modern">
+                  <label>Tagline / Motto</label>
+                  <input type="text" id="cfg-tagline">
+                </div>
+                <div class="form-group-modern">
+                  <label>Phone / Landline</label>
+                  <input type="text" id="cfg-phone">
+                </div>
+                <div class="form-group-modern">
+                  <label>UPI ID (for QR Code Payments)</label>
+                  <input type="text" id="cfg-upi_id" placeholder="hotel@upi">
+                </div>
+                <div class="form-group-modern" style="grid-column: 1 / -1;">
+                  <label>Full Address</label>
+                  <input type="text" id="cfg-address">
+                </div>
+              </div>
+              <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn-restro-orange" style="padding: 0.65rem 1.4rem;">Save Profile Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- TAB 5: Staff PINs (Access Control) -->
+        <div id="tab-pins" class="tab-pane hidden">
+          <div class="settings-card-modern">
+            <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem;">Station Security & PIN Codes</h3>
+            <p style="font-size: 0.82rem; color: #64748b; margin-bottom: 1.5rem;">
+              Enforces hierarchy isolation: Kitchen staff cannot access POS or Billing. Service staff only sees ready/cooking food.
+            </p>
+
+            <form id="form-pins" onsubmit="savePins(event)">
+              <div class="form-grid-modern">
+                <div class="form-group-modern">
+                  <label>Owner Desk PIN (Executive Daily Sales Portal)</label>
+                  <input type="password" maxlength="6" id="pin-owner" placeholder="Default: 9999 (min 4 digits)">
+                </div>
+                <div class="form-group-modern">
+                  <label>Manager Desk PIN (Full Administrative Access)</label>
+                  <input type="password" maxlength="6" id="pin-manager" placeholder="New PIN (min 4 digits)">
+                </div>
+                <div class="form-group-modern">
+                  <label>Kitchen KDS PIN (Cooking screen only)</label>
+                  <input type="password" maxlength="6" id="pin-kitchen" placeholder="New PIN (min 4 digits)">
+                </div>
+                <div class="form-group-modern">
+                  <label>Service Area PIN (Expediter screen only)</label>
+                  <input type="password" maxlength="6" id="pin-service" placeholder="New PIN (min 4 digits)">
+                </div>
+              </div>
+              <div style="margin-top: 1.5rem;">
+                <button type="submit" class="btn-restro-orange" style="padding: 0.65rem 1.4rem;">Update Security PINs</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Captains & Waiter Staff Management -->
+          <div class="settings-card-modern" style="margin-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+              <div>
+                <h3 style="font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.35rem; display: flex; align-items: center; gap: 0.5rem;">
+                  <span>👨‍✈️</span>
+                  <span>Order Captains & Waiter Staff</span>
+                </h3>
+                <p style="font-size: 0.82rem; color: #64748b; margin: 0;">
+                  Add as many captains as you need with custom names and personal PINs. Each captain's custom name will be automatically stamped on orders and KOT slips.
+                </p>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="openAddCaptainModal()"
+                      style="background: #2563eb; color: #fff; font-weight: 700; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+                <span>➕ Add New Captain</span>
+              </button>
+            </div>
+
+            <!-- Captains List Table -->
+            <div style="overflow-x: auto;">
+              <table class="restro-table-modern">
+                <thead>
+                  <tr>
+                    <th>Captain Profile</th>
+                    <th>Role</th>
+                    <th>Personal PIN</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="captains-table-body">
+                  <!-- Rendered dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 6: Daily Sales & Bills -->
+        <div id="tab-reports" class="tab-pane hidden">
+          <div class="settings-card-modern" style="margin-bottom: 1.5rem;">
+            <!-- Header & Date Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid #edf2f7; padding-bottom: 1.25rem; margin-bottom: 1.25rem;">
+              <div>
+                <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem;">Daily Sales & Day-End Bills</h3>
+                <p style="font-size: 0.82rem; color: #64748b;">
+                  Track daily restaurant revenue, cash / UPI / card collections, and inspect individual bills.
+                </p>
+              </div>
+
+              <!-- Date Selection Controls & Actions -->
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-report-today" onclick="setReportDate('today')">Today</button>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-report-yesterday" onclick="setReportDate('yesterday')">Yesterday</button>
+                <div style="display: inline-flex; align-items: center; gap: 0.35rem; background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.2rem 0.6rem;">
+                  <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Date:</span>
+                  <input type="date" id="report-date-input" onchange="onReportDateChanged()" style="border: none; background: transparent; font-size: 0.85rem; font-weight: 700; color: #0f172a; outline: none; cursor: pointer;">
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadReports()" title="Refresh Data">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+                  Sync
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="openCashHandoverModal()" style="background: #ecfdf5; border-color: #86efac; color: #166534; font-weight: 800; display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 6v2m0 8v2"/></svg>
+                  <span>💰 Cash Handover</span>
+                </button>
+                <button type="button" class="btn-restro-orange btn-sm" onclick="openDailySettlementModal()" style="padding: 0.45rem 0.85rem; font-size: 0.82rem; display: inline-flex; align-items: center; gap: 0.35rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  <span>📋 Settle Day (EOD)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Daily Summary KPI Cards -->
+            <div class="form-grid-modern" id="audit-metrics-grid" style="margin-bottom: 1.5rem;">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Sub Navigation Tabs for Bills, Settlement, Handover & Trend -->
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button type="button" id="subtab-btn-bills" class="btn-subtab active" onclick="switchReportSubTab('bills')" style="border: none; background: transparent; padding: 0.6rem 0.25rem; font-size: 0.92rem; font-weight: 700; cursor: pointer; border-bottom: 2px solid #ea580c; color: #ea580c; transition: all 0.2s;">
+                  Bills for Selected Day (<span id="day-bills-count">0</span>)
+                </button>
+                <button type="button" id="subtab-btn-settlement" class="btn-subtab" onclick="switchReportSubTab('settlement')" style="border: none; background: transparent; padding: 0.6rem 0.25rem; font-size: 0.92rem; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; color: #64748b; transition: all 0.2s;">
+                  Daily Settlement (EOD Close)
+                </button>
+                <button type="button" id="subtab-btn-handover" class="btn-subtab" onclick="switchReportSubTab('handover')" style="border: none; background: transparent; padding: 0.6rem 0.25rem; font-size: 0.92rem; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; color: #64748b; transition: all 0.2s;">
+                  Cash Handover Register
+                </button>
+                <button type="button" id="subtab-btn-history" class="btn-subtab" onclick="switchReportSubTab('history')" style="border: none; background: transparent; padding: 0.6rem 0.25rem; font-size: 0.92rem; font-weight: 700; cursor: pointer; border-bottom: 2px solid transparent; color: #64748b; transition: all 0.2s;">
+                  30-Day Sales History Trend
+                </button>
+              </div>
+
+              <!-- Filter Strip for Bills -->
+              <div id="bills-filter-strip" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <input type="text" id="report-bill-search" class="channel-input" placeholder="Search bill #, token, table..." oninput="filterDailyBillsTable()" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; width: 200px; height: 34px;">
+                <select id="report-channel-filter" class="channel-input" onchange="filterDailyBillsTable()" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; height: 34px;">
+                  <option value="all">All Channels</option>
+                  <option value="dine_in">Dine-In</option>
+                  <option value="takeaway">Takeaway</option>
+                  <option value="swiggy">Swiggy</option>
+                  <option value="zomato">Zomato</option>
+                </select>
+                <select id="report-status-filter" class="channel-input" onchange="filterDailyBillsTable()" style="padding: 0.35rem 0.75rem; font-size: 0.82rem; height: 34px;">
+                  <option value="all">All Payment Status</option>
+                  <option value="paid">Paid Only</option>
+                  <option value="unpaid">Unpaid / Running</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- VIEW 1: All Bills for Selected Day -->
+            <div id="report-subview-bills">
+              <div style="overflow-x: auto;">
+                <table class="restro-table-modern">
+                  <thead>
+                    <tr>
+                      <th style="width: 140px;">Bill # / Token</th>
+                      <th style="width: 90px;">Time</th>
+                      <th>Table / Channel</th>
+                      <th>Items Purchased</th>
+                      <th>Payment Mode</th>
+                      <th>Total (₹)</th>
+                      <th style="text-align: right; width: 140px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="daily-bills-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- VIEW 2: Daily Settlement (EOD Close) -->
+            <div id="report-subview-settlement" class="hidden">
+              <div id="settlement-container" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- VIEW 3: Cash Handover Register -->
+            <div id="report-subview-handover" class="hidden">
+              <div id="handover-container" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+
+            <!-- VIEW 4: 30-Day Sales Trend -->
+            <div id="report-subview-history" class="hidden">
+              <div style="overflow-x: auto;">
+                <table class="restro-table-modern">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Total Sales (₹)</th>
+                      <th>Bills Paid</th>
+                      <th>Cash</th>
+                      <th>UPI</th>
+                      <th>Card</th>
+                      <th>GST Tax (₹)</th>
+                      <th style="text-align: right;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="sales-history-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+        <!-- TAB 8: Cloud Backup & Sync (Disaster Recovery) -->
+        <div id="tab-cloud" class="tab-pane hidden">
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            
+            <!-- Hero Status & Immediate Action Banner -->
+            <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 14px; padding: 1.75rem; color: #fff; box-shadow: 0 4px 20px rgba(15,23,42,0.15);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1.5rem; flex-wrap: wrap;">
+                <div>
+                  <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; padding: 0.35rem 0.8rem; border-radius: 20px; font-size: 0.82rem; font-weight: 700; margin-bottom: 0.75rem;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 8px #22c55e;"></span>
+                    <span id="cloud-status-badge">Cloud Vault Online & Protected</span>
+                  </div>
+                  <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 0.4rem; color: #fff; display: flex; align-items: center; gap: 0.6rem;">
+                    ☁️ Cloud Sync & Disaster Recovery
+                  </h2>
+                  <p style="font-size: 0.88rem; color: #94a3b8; max-width: 640px; margin: 0; line-height: 1.5;">
+                    Push full restaurant database snapshots to secure cloud storage. If your POS machine crashes, you can pull the latest backup instantly onto any computer with zero data loss.
+                  </p>
+                </div>
+
+                <!-- Primary Action Buttons -->
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <button type="button" class="btn" onclick="triggerManualCloudPush()" id="btn-cloud-push"
+                          style="background: #2563eb; color: #fff; font-weight: 800; padding: 0.75rem 1.4rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(37,99,235,0.35); transition: all 0.2s; border: none; cursor: pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 11 12 7 9 10"/><polyline points="12 7 15 10"/></svg>
+                    <span>☁️ Push to Cloud Now</span>
+                  </button>
+
+                  <button type="button" class="btn" onclick="confirmCloudPullPrompt()" id="btn-cloud-pull"
+                          style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-weight: 700; padding: 0.75rem 1.25rem; border-radius: 10px; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; transition: all 0.2s; cursor: pointer;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/><polyline points="12 11 12 17 9 14"/><polyline points="12 17 15 14"/></svg>
+                    <span>⬇️ Pull Latest from Cloud</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Info Cards Grid -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.25rem;">
+                <div style="background: rgba(255,255,255,0.05); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                  <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Last Pushed</div>
+                  <div id="cloud-last-push-text" style="font-size: 1rem; font-weight: 800; color: #38bdf8; margin-top: 0.25rem;">Loading...</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                  <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Last Pulled / Restored</div>
+                  <div id="cloud-last-pull-text" style="font-size: 1rem; font-weight: 800; color: #fbbf24; margin-top: 0.25rem;">Loading...</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                  <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Available Snapshots</div>
+                  <div id="cloud-snapshots-count" style="font-size: 1rem; font-weight: 800; color: #a7f3d0; margin-top: 0.25rem;">0 Backups</div>
+                </div>
+                <div style="background: rgba(255,255,255,0.05); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                  <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em;">Active Provider</div>
+                  <div id="cloud-provider-text" style="font-size: 1rem; font-weight: 800; color: #e2e8f0; margin-top: 0.25rem;">RestroKOT Cloud Vault</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Settings & Configuration Card -->
+            <div class="restro-card-modern">
+              <div class="restro-card-head" style="margin-bottom: 1.25rem;">
+                <div>
+                  <div class="restro-card-title">Cloud Storage Configuration</div>
+                  <div class="restro-card-subtitle">Choose where backups are stored and configure automated sync rules</div>
+                </div>
+              </div>
+
+              <form onsubmit="saveCloudConfigForm(event)">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+                  
+                  <div class="form-group">
+                    <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; display: block;">Storage Provider</label>
+                    <select id="cloud-form-provider" class="channel-input" onchange="toggleCloudProviderFields()" style="width: 100%; height: 42px;">
+                      <option value="cloud_vault">📁 RestroKOT Vault / Cloud Sync Folder (Google Drive / Dropbox / USB)</option>
+                      <option value="webhook_http">🌐 Custom Cloud Webhook / REST Server</option>
+                    </select>
+                    <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.35rem;">
+                      Works offline-first. When synced to Google Drive / OneDrive folder, files auto-sync to cloud.
+                    </div>
+                  </div>
+
+                  <div class="form-group" id="group-vault-path">
+                    <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; display: block;">Vault Folder Path</label>
+                    <input type="text" id="cloud-form-vault-path" class="channel-input" placeholder="data/cloud_vault (leave blank for default)" style="width: 100%; height: 42px;">
+                    <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.35rem;">
+                      Active storage: <code id="cloud-resolved-dir" style="color: #0284c7; font-weight: 600;">data/cloud_vault</code>
+                    </div>
+                  </div>
+
+                  <div class="form-group hidden" id="group-endpoint-url">
+                    <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; display: block;">Cloud Webhook URL</label>
+                    <input type="url" id="cloud-form-endpoint-url" class="channel-input" placeholder="https://api.yourcloud.com/v1/backups/restrokot" style="width: 100%; height: 42px;">
+                  </div>
+
+                  <div class="form-group hidden" id="group-api-key">
+                    <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 0.35rem; display: block;">API Secret / Auth Bearer Token</label>
+                    <input type="password" id="cloud-form-api-key" class="channel-input" placeholder="Optional secret key" style="width: 100%; height: 42px;">
+                  </div>
+
+                </div>
+
+                <!-- Automation Options -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem;">
+                  <div style="font-size: 0.88rem; font-weight: 800; color: #0f172a; margin-bottom: 0.75rem;">⚡ Automated Cloud Sync Rules</div>
+                  <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    
+                    <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                      <input type="checkbox" id="cloud-form-auto-settle" style="width: 18px; height: 18px; margin-top: 2px; accent-color: #2563eb;">
+                      <div>
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Auto-Push on Daily Settlement (EOD Close) <span style="background: #dcfce7; color: #15803d; font-size: 0.72rem; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">Recommended</span></div>
+                        <div style="font-size: 0.78rem; color: #64748b;">Whenever manager performs Day Close & Settlement, system automatically takes an atomic snapshot and pushes to cloud.</div>
+                      </div>
+                    </label>
+
+                    <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                      <input type="checkbox" id="cloud-form-auto-hourly" style="width: 18px; height: 18px; margin-top: 2px; accent-color: #2563eb;">
+                      <div>
+                        <div style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Hourly Background Push</div>
+                        <div style="font-size: 0.78rem; color: #64748b;">Automatically pushes snapshot to cloud vault every 60 minutes in the background without interrupting cashier.</div>
+                      </div>
+                    </label>
+
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end;">
+                  <button type="submit" class="btn btn-primary" id="btn-save-cloud-config" style="padding: 0.65rem 1.5rem; font-weight: 700;">
+                    💾 Save Cloud Configuration
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Cloud Snapshot Vault (History & Restore Table) -->
+            <div class="restro-card-modern">
+              <div class="restro-card-head" style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div class="restro-card-title">Cloud Snapshot Vault & History</div>
+                  <div class="restro-card-subtitle">All snapshots saved in cloud vault. Select any snapshot to restore or download.</div>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm" onclick="loadCloudBackupsList()" style="font-weight: 700; display: inline-flex; align-items: center; gap: 0.4rem;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                  <span>Refresh List</span>
+                </button>
+              </div>
+
+              <div style="overflow-x: auto;">
+                <table class="restro-table-modern">
+                  <thead>
+                    <tr>
+                      <th style="min-width: 190px;">Snapshot Name & Date</th>
+                      <th>Trigger Type</th>
+                      <th>Size</th>
+                      <th>Orders / Sales (₹)</th>
+                      <th>Cloud Status</th>
+                      <th style="text-align: right; min-width: 180px;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="cloud-backups-table-body">
+                    <!-- Rendered dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- Add / Edit Dish Modal -->
+  <div class="modal-overlay hidden" id="item-modal">
+    <div class="modal-box" style="max-width: 480px;">
+      <div class="modal-header">
+        <h3 id="item-modal-title" style="font-weight: 800; color: #0f172a;">Add New Dish</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeItemModal()">✕</button>
+      </div>
+      <form onsubmit="saveItemForm(event)">
+        <input type="hidden" id="edit-item-id" value="">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Dish Name *</label>
+            <input type="text" id="item-form-name" class="channel-input" required placeholder="e.g. Chicken Butter Masala">
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Category *</label>
+              <button type="button" onclick="openAddCategoryModal()" style="border: none; background: transparent; color: #ea580c; font-size: 0.8rem; font-weight: 700; cursor: pointer;">+ New Category</button>
+            </div>
+            <select id="item-form-category" class="restro-filter-select" style="width: 100%;" required></select>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Dietary Type *</label>
+            <select id="item-form-type" class="restro-filter-select" style="width: 100%;">
+              <option value="veg">🟢 Veg Only</option>
+              <option value="non_veg">🔴 Non-Veg Only</option>
+              <option value="egg">🟡 Egg Only</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Price in ₹ (INR) *</label>
+            <input type="number" step="1" min="1" id="item-form-price" class="channel-input" required placeholder="250">
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Short Description (Optional)</label>
+            <input type="text" id="item-form-desc" class="channel-input" placeholder="Ingredients, spice level, preparation style">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeItemModal()">Cancel</button>
+          <button type="submit" class="btn-restro-orange" id="item-form-submit-btn">Save Dish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add / Edit Category Modal -->
+  <div class="modal-overlay hidden" id="category-modal" style="z-index: 260;">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 id="category-modal-title" style="font-weight: 800; color: #0f172a;">Add New Category</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeCategoryModal()">✕</button>
+      </div>
+      <form onsubmit="saveCategoryForm(event)">
+        <input type="hidden" id="category-form-id" value="">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Category Name *</label>
+            <input type="text" id="category-form-name" class="channel-input" required placeholder="e.g. Desserts & Shakes, Soups, Mocktails">
+          </div>
+          <div class="form-group">
+            <label>Category Code (Unique Key)</label>
+            <input type="text" id="category-form-code" class="channel-input" placeholder="e.g. desserts (auto-generated if empty)">
+            <small style="color: #64748b; font-size: 0.75rem;">Used internally for ordering and reports</small>
+          </div>
+          <div class="form-group">
+            <label>Display Icon / Emoji</label>
+            <input type="text" id="category-form-icon" class="channel-input" value="🍽️" placeholder="e.g. 🍨, 🥤, 🍛, 🍲, ☕">
+          </div>
+          <div class="form-group">
+            <label>Display Sort Order</label>
+            <input type="number" id="category-form-sort" class="channel-input" value="1" min="0" max="999">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCategoryModal()">Cancel</button>
+          <button type="submit" class="btn-restro-orange" id="category-form-submit-btn">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add / Edit Table Modal (Settings) -->
+  <div class="modal-overlay hidden" id="table-settings-modal">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 id="table-settings-modal-title" style="font-weight: 800; color: #0f172a;">Add New Dining Table</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeTableSettingsModal()">✕</button>
+      </div>
+      <form onsubmit="saveTableSettingsForm(event)">
+        <input type="hidden" id="edit-table-settings-id" value="">
+        <div class="modal-body">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Table Name / Code *</label>
+            <input type="text" id="table-settings-name" class="channel-input" required placeholder="e.g. T-13, VIP-3, Table 9">
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Floor / Section *</label>
+            <input type="text" id="table-settings-section" list="settings-sec-list" class="channel-input" placeholder="e.g. AC Hall, Rooftop, Garden" value="AC Hall">
+            <datalist id="settings-sec-list">
+              <option value="AC Hall">
+              <option value="Main Dining">
+              <option value="Garden Outdoor">
+              <option value="Rooftop Lounge">
+              <option value="Private Dining">
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Seating Capacity</label>
+            <input type="number" id="table-settings-capacity" class="channel-input" min="1" max="50" value="4">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeTableSettingsModal()">Cancel</button>
+          <button type="submit" class="btn-restro-orange" id="table-settings-submit-btn">Save Table</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Thermal Print Modal / Receipt View -->
+  <div class="modal-overlay hidden" id="print-modal" style="z-index: 300;">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 style="font-weight: 800; color: #0f172a;" id="print-modal-title">Tax Invoice & Thermal Receipt</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closePrintModal()">✕</button>
+      </div>
+      <div class="modal-body" style="background: white; color: black; font-family: monospace; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0;" id="thermal-receipt-area">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePrintModal()">Close</button>
+        <button class="btn-restro-orange" onclick="window.print()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          <span id="print-action-label">Print Thermal Slip (80mm)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Daily Cash Handover & Drawer Reconciliation -->
+  <div class="modal-overlay hidden" id="modal-cash-handover" style="z-index: 310;">
+    <div class="modal-box" style="max-width: 560px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-weight: 800; color: #0f172a; margin-bottom: 2px;">Daily Cash Handover</h3>
+          <div style="font-size: 0.78rem; color: #64748b;">Reconcile cash drawer, record float & transfer between cashier and manager</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="closeCashHandoverModal()">✕</button>
+      </div>
+      <form id="form-cash-handover" onsubmit="saveCashHandoverForm(event)">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem; max-height: 75vh; overflow-y: auto;">
+          
+          <!-- Shift & Date Row -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 700; color: #334155;">Handover Date</label>
+              <input type="date" id="handover-input-date" class="channel-input" required onchange="onHandoverDateChanged()">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 700; color: #334155;">Shift</label>
+              <select id="handover-input-shift" class="channel-input">
+                <option value="Full Day Close">Full Day Close (Night EOD)</option>
+                <option value="Morning Shift">Morning Shift (Lunch)</option>
+                <option value="Evening Shift">Evening Shift (Dinner)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Handed by & Received by -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 700; color: #334155;">Handed Over By (Cashier)</label>
+              <input type="text" id="handover-input-handed" class="channel-input" placeholder="e.g. Ramesh" required value="Cashier">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label style="font-size: 0.8rem; font-weight: 700; color: #334155;">Received By (Manager/Owner)</label>
+              <input type="text" id="handover-input-received" class="channel-input" placeholder="e.g. Manager" required value="Manager">
+            </div>
+          </div>
+
+          <!-- Financial Snapshot Breakdown (3 Box Grid) -->
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; background: #f8fafc; padding: 0.85rem; border-radius: 12px; border: 1.5px solid #e2e8f0;">
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase;">1. Opening Float (₹)</label>
+              <input type="number" step="1" id="handover-input-float" class="channel-input" style="font-size: 0.95rem; font-weight: 800; margin-top: 4px;" value="1000" oninput="recalcHandoverVariance()">
+              <span style="font-size: 0.68rem; color: #94a3b8;">Change float kept in morning</span>
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase;">2. System Cash Sales (₹)</label>
+              <input type="number" step="0.01" id="handover-input-sales" class="channel-input" style="font-size: 0.95rem; font-weight: 800; margin-top: 4px; background: #ffffff; color: #166534;" readonly>
+              <span style="font-size: 0.68rem; color: #94a3b8;">Auto-calculated from paid cash bills</span>
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase;">3. Petty Expenses (₹)</label>
+              <input type="number" step="1" id="handover-input-expenses" class="channel-input" style="font-size: 0.95rem; font-weight: 800; margin-top: 4px; color: #b91c1c;" value="0" oninput="recalcHandoverVariance()">
+              <span style="font-size: 0.68rem; color: #94a3b8;">Cash paid out from drawer</span>
+            </div>
+          </div>
+
+          <!-- Petty Expense Reason -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569;">Petty Cash Paid-Out Notes (optional)</label>
+            <input type="text" id="handover-input-exp-notes" class="channel-input" placeholder="e.g. ₹250 for milk, lemons & ice from local market">
+          </div>
+
+          <!-- Expected Cash Box -->
+          <div style="background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 800; color: #1e40af; text-transform: uppercase;">Expected Cash in Drawer</div>
+              <div style="font-size: 0.72rem; color: #3b82f6;">(Opening Float + Cash Sales - Petty Expenses)</div>
+            </div>
+            <div style="font-size: 1.4rem; font-weight: 900; color: #1d4ed8;" id="handover-display-expected">₹0.00</div>
+          </div>
+
+          <!-- Actual Counted Cash -->
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <label style="font-size: 0.82rem; font-weight: 800; color: #0f172a;">Actual Physical Cash Counted in Drawer (₹)</label>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="toggleDenominationsDrawer()" style="font-size: 0.72rem; padding: 2px 8px;">
+                🔢 Denominations Counter ▾
+              </button>
+            </div>
+            <input type="number" step="1" id="handover-input-actual" class="channel-input" style="font-size: 1.25rem; font-weight: 900; color: #0f172a; padding: 0.6rem 0.85rem;" placeholder="Enter counted physical cash..." required oninput="recalcHandoverVariance(false)">
+          </div>
+
+          <!-- Currency Denominations Breakdown Drawer -->
+          <div id="handover-denominations-box" class="hidden" style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 2px;">Currency Denomination Counter</div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">₹500 x</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="500" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">₹200 x</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="200" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">₹100 x</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="100" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">₹50 x</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="50" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">₹20 x</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="20" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">₹10 x</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="10" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div>
+                <label style="font-size: 0.72rem; font-weight: 700;">Coins (₹)</label>
+                <input type="number" min="0" class="channel-input denom-input" data-val="1" placeholder="0" oninput="calcDenominationsTotal()">
+              </div>
+              <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+                <span style="font-size: 0.7rem; color: #64748b; font-weight: 700;">Total from Count</span>
+                <span style="font-size: 0.95rem; font-weight: 800; color: #0f172a;" id="denom-calc-total">₹0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Variance Box -->
+          <div id="handover-variance-box" style="background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 12px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase;">Cash Drawer Variance</div>
+              <div style="font-size: 0.72rem; color: #64748b;" id="handover-variance-label">Difference (Actual - Expected)</div>
+            </div>
+            <div style="font-size: 1.35rem; font-weight: 900;" id="handover-display-variance">₹0.00</div>
+          </div>
+
+          <!-- Handover Remarks -->
+          <div class="form-group" style="margin-bottom: 0;">
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569;">Closing Remarks & Drawer Handover Notes</label>
+            <input type="text" id="handover-input-notes" class="channel-input" placeholder="e.g. All cash verified and handed over to manager locker">
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeCashHandoverModal()">Cancel</button>
+          <button type="submit" class="btn-restro-orange" id="btn-save-handover">
+            💾 Save & Record Handover
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Daily Settlement (EOD Day Close) -->
+  <div class="modal-overlay hidden" id="modal-daily-settlement" style="z-index: 310;">
+    <div class="modal-box" style="max-width: 520px;">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-weight: 800; color: #0f172a; margin-bottom: 2px;">Daily Day-End Settlement (Z-Report)</h3>
+          <div style="font-size: 0.78rem; color: #64748b;">Close restaurant day sales, freeze daily accounts & print EOD report</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="closeDailySettlementModal()">✕</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem; max-height: 75vh; overflow-y: auto;">
+        
+        <!-- Target Date Banner -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase;">Settlement Date</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #0f172a;" id="settle-modal-date-display">Today</div>
+          </div>
+          <span id="settle-modal-status-badge" class="badge-channel" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a; font-weight: 800; padding: 4px 10px; border-radius: 8px;">
+            PENDING DAY CLOSE
+          </span>
+        </div>
+
+        <!-- Unpaid Orders Alert (if any tables are open) -->
+        <div id="settle-unpaid-alert" class="hidden" style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px; padding: 0.85rem; color: #92400e;">
+          <div style="font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            ⚠️ Active Unpaid Tables Found!
+          </div>
+          <div style="font-size: 0.78rem; line-height: 1.4;" id="settle-unpaid-list-text">
+            There are active tables with unpaid bills. Settle them first or they will carry over as open.
+          </div>
+        </div>
+
+        <!-- Key Financial Summary Matrix -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem;">
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem;">
+            <div style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Gross Sales</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #0f172a; margin-top: 2px;" id="settle-kpi-gross">₹0</div>
+          </div>
+          <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.75rem;">
+            <div style="font-size: 0.7rem; font-weight: 700; color: #64748b; text-transform: uppercase;">GST Tax</div>
+            <div style="font-size: 1.1rem; font-weight: 900; color: #0f172a; margin-top: 2px;" id="settle-kpi-tax">₹0</div>
+          </div>
+          <div style="background: #ecfdf5; border: 1.5px solid #86efac; border-radius: 10px; padding: 0.75rem;">
+            <div style="font-size: 0.7rem; font-weight: 800; color: #166534; text-transform: uppercase;">Net Realized</div>
+            <div style="font-size: 1.15rem; font-weight: 900; color: #15803d; margin-top: 2px;" id="settle-kpi-net">₹0</div>
+          </div>
+        </div>
+
+        <!-- Payment Breakdown Strip -->
+        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.45rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 2px;">Collections Breakdown</div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span style="color: #475569; display: flex; align-items: center; gap: 6px;">💵 Cash Sales:</span>
+            <strong style="color: #0f172a;" id="settle-kpi-cash">₹0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span style="color: #475569; display: flex; align-items: center; gap: 6px;">📱 UPI / QR Code:</span>
+            <strong style="color: #0f172a;" id="settle-kpi-upi">₹0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem;">
+            <span style="color: #475569; display: flex; align-items: center; gap: 6px;">💳 Card / POS:</span>
+            <strong style="color: #0f172a;" id="settle-kpi-card">₹0</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; border-top: 1px dashed #e2e8f0; padding-top: 0.4rem; margin-top: 2px;">
+            <span style="color: #64748b;">Paid Bills Count:</span>
+            <strong style="color: #0f172a;" id="settle-kpi-count">0 bills</strong>
+          </div>
+        </div>
+
+        <!-- Daily Cash Drawer Reconciliation (Integrated into EOD Close) -->
+        <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.85rem; display: flex; flex-direction: column; gap: 0.65rem;">
+          <div style="font-size: 0.75rem; font-weight: 800; color: #475569; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center;">
+            <span>💰 Daily Cash Drawer Reconciliation</span>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleSettleDenominationsDrawer()" style="font-size: 0.72rem; padding: 2px 7px;">
+              🪙 Count Denominations
+            </button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 700; color: #64748b;">Opening Cash Float (₹)</label>
+              <input type="number" id="settle-cash-float" class="form-input" style="width: 100%; font-size: 0.85rem;" value="0" min="0" step="any" oninput="recalcSettleCashVariance()">
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 700; color: #64748b;">Petty Expenses (₹)</label>
+              <input type="number" id="settle-cash-petty" class="form-input" style="width: 100%; font-size: 0.85rem;" value="0" min="0" step="any" oninput="recalcSettleCashVariance()">
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 0.82rem; background: #f8fafc; padding: 0.4rem 0.6rem; border-radius: 6px;">
+            <span style="color: #64748b;">Expected Drawer Cash:</span>
+            <strong style="color: #0f172a;" id="settle-expected-cash-label">₹0.00</strong>
+          </div>
+
+          <div>
+            <label style="font-size: 0.72rem; font-weight: 700; color: #64748b;">Actual Physical Cash Counted (₹)</label>
+            <input type="number" id="settle-actual-cash" class="form-input" style="width: 100%; font-size: 0.95rem; font-weight: 800;" value="0" min="0" step="any" oninput="recalcSettleCashVariance()">
+          </div>
+
+          <!-- Real-Time Variance Pill -->
+          <div id="settle-variance-pill" style="border-radius: 8px; padding: 0.4rem 0.65rem; font-size: 0.8rem; font-weight: 800; display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; color: #475569;">
+            <span>Cash Drawer Variance:</span>
+            <span id="settle-variance-val">₹0.00 (Balanced)</span>
+          </div>
+
+          <!-- Denominations Drawer inside Settlement Modal -->
+          <div id="settle-denominations-drawer" class="hidden" style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 8px; padding: 0.65rem;">
+            <div style="font-size: 0.72rem; font-weight: 800; color: #475569; margin-bottom: 0.4rem;">Physical Currency Notes & Coins Count</div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.35rem; font-size: 0.75rem;">
+              <div>
+                <label>₹500</label>
+                <input type="number" id="settle-denom-500" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div>
+                <label>₹200</label>
+                <input type="number" id="settle-denom-200" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div>
+                <label>₹100</label>
+                <input type="number" id="settle-denom-100" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div>
+                <label>₹50</label>
+                <input type="number" id="settle-denom-50" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div>
+                <label>₹20</label>
+                <input type="number" id="settle-denom-20" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div>
+                <label>₹10</label>
+                <input type="number" id="settle-denom-10" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div>
+                <label>Coins</label>
+                <input type="number" id="settle-denom-coins" class="form-input" style="padding: 2px 4px; font-size: 0.75rem;" min="0" value="0" oninput="calcSettleDenominations()">
+              </div>
+              <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+                <span style="font-size: 0.68rem; color: #64748b;">Total:</span>
+                <strong id="settle-denom-total-label" style="color: #16a34a; font-size: 0.8rem;">₹0</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inputs: Settled By & Closing Remarks -->
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-size: 0.78rem; font-weight: 700; color: #475569;">Settled By (Manager)</label>
+          <input type="text" id="settle-input-by" class="channel-input" value="Manager" required>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label style="font-size: 0.78rem; font-weight: 700; color: #475569;">Day Close Notes (optional)</label>
+          <input type="text" id="settle-input-notes" class="channel-input" placeholder="e.g. Accounts verified, cash drawer balanced and locked">
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeDailySettlementModal()">Cancel</button>
+        <button type="button" class="btn btn-secondary" onclick="printSettlementZReport()" style="display: inline-flex; align-items: center; gap: 4px;">
+          🖨️ Preview Z-Report
+        </button>
+        <button type="button" class="btn-restro-orange" onclick="confirmDailySettlement()" id="btn-confirm-settlement">
+          📋 Confirm Day Settlement
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Captain Modal -->
+  <div class="modal-overlay hidden" id="captain-modal">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 id="captain-modal-title" style="font-weight: 800; color: #0f172a;">Add New Captain</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeCaptainModal()">✕</button>
+      </div>
+      <form onsubmit="saveCaptainForm(event)">
+        <input type="hidden" id="edit-captain-id" value="">
+        <div class="modal-body" style="padding: 1.25rem;">
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; display: block;">Captain Custom Name *</label>
+            <input type="text" id="captain-form-name" class="channel-input" required placeholder="e.g. Captain Rahul, Suresh, Priya" style="width: 100%; height: 42px;">
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;">This custom name will appear on KOT tickets and bills.</div>
+          </div>
+          <div class="form-group" style="margin-bottom: 1rem;">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; display: block;" id="captain-pin-label">Login PIN (4-6 digits) *</label>
+            <input type="password" maxlength="6" id="captain-form-pin" class="channel-input" placeholder="e.g. 4411" style="width: 100%; height: 42px;">
+            <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;" id="captain-pin-hint">Required for new captains. (Leave empty when editing to keep current PIN)</div>
+          </div>
+        </div>
+        <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.75rem; padding: 1rem 1.25rem; border-top: 1px solid #e2e8f0;">
+          <button type="button" class="btn btn-secondary" onclick="closeCaptainModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-captain" style="background: #2563eb; color: #fff; font-weight: 700; padding: 0.6rem 1.25rem; border: none; border-radius: 8px; cursor: pointer;">Save Captain</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/icons.js?v=3.0"></script>
+  <script src="/js/audio.js?v=3.0"></script>
+  <script src="/js/ws.js?v=3.0"></script>
+  <script src="/js/settings.js?v=3.5"></script>
+</body>
+</html>

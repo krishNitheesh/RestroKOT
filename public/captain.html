@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Captain Order Terminal | RestroKOT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3.5">
+  <style>
+    /* Captain Mobile First Responsive Layout */
+    body {
+      background: #f8fafc;
+      color: #0f172a;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .captain-header {
+      background: #ffffff;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding: 0.65rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+    }
+
+    .captain-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .captain-brand-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+    }
+
+    .captain-view {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0.85rem;
+      padding-bottom: 6rem;
+    }
+
+    /* Table Grid */
+    .captain-table-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    .captain-table-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.85rem 0.65rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100px;
+      user-select: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .captain-table-card:active {
+      transform: scale(0.97);
+    }
+
+    .captain-table-card.vacant {
+      border-color: #86efac;
+      background: #f0fdf4;
+    }
+
+    .captain-table-card.vacant:hover {
+      border-color: #22c55e;
+      background: #dcfce7;
+    }
+
+    .captain-table-card.occupied {
+      border-color: #fdba74;
+      background: #fff7ed;
+    }
+
+    .captain-table-card.occupied:hover {
+      border-color: #ea580c;
+    }
+
+    .captain-table-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #0f172a;
+    }
+
+    .captain-table-status {
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 2px;
+    }
+
+    .captain-table-total {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #ea580c;
+      margin-top: 4px;
+    }
+
+    /* Menu Items List in Captain Mode */
+    .captain-dish-card {
+      background: #ffffff;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 0.75rem 0.85rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.65rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .captain-dish-card.in-cart {
+      border-color: #ea580c;
+      background: #fffaf5;
+    }
+
+    .captain-stepper {
+      display: inline-flex;
+      align-items: center;
+      border: 1.5px solid #ea580c;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .captain-stepper button {
+      background: #fff;
+      border: none;
+      color: #ea580c;
+      width: 32px;
+      height: 32px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .captain-stepper button:active {
+      background: #ea580c;
+      color: #ffffff;
+    }
+
+    .captain-stepper span {
+      font-weight: 800;
+      font-size: 0.95rem;
+      min-width: 26px;
+      text-align: center;
+      color: #0f172a;
+    }
+
+    .btn-add-touch {
+      background: #ea580c;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.45rem 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .btn-add-touch:active {
+      background: #c2410c;
+      transform: scale(0.96);
+    }
+
+    /* Sticky Bottom Order Bar */
+    .captain-bottom-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border-top: 1.5px solid #e2e8f0;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+      z-index: 100;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .captain-punch-btn {
+      background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 1.25rem;
+      font-weight: 900;
+      font-size: 0.92rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
+      transition: all 0.15s ease;
+    }
+
+    .captain-punch-btn:active {
+      transform: scale(0.97);
+    }
+
+    .captain-punch-btn:disabled {
+      background: #cbd5e1;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header class="captain-header">
+    <div class="captain-brand">
+      <div class="captain-brand-icon">C</div>
+      <div>
+        <div style="font-weight: 900; font-size: 0.92rem; color: #0f172a; line-height: 1.1;">Captain Portal</div>
+        <div style="font-size: 0.72rem; color: #64748b; font-weight: 700;">Mobile Order Taking</div>
+      </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 0.45rem;">
+      <button class="btn btn-secondary btn-sm" onclick="promptChangeCaptain()" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; font-weight: 800; border-radius: 8px;">
+        👤 <span id="captain-name-label">Captain</span>
+      </button>
+      <a href="/login" class="btn btn-secondary btn-sm" style="padding: 0.35rem 0.65rem; font-size: 0.75rem; border-radius: 8px;">
+        Logout
+      </a>
+    </div>
+  </header>
+
+  <!-- VIEW 1: Floor & Tables Grid -->
+  <main id="captain-view-tables" class="captain-view">
+    <!-- Quick Section Pills & Status Strip -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem; flex-wrap: wrap; gap: 0.45rem;">
+      <div>
+        <h2 style="font-size: 1.15rem; font-weight: 900; margin: 0; color: #0f172a;">Dining Tables Floor</h2>
+        <div style="font-size: 0.76rem; color: #64748b; margin-top: 2px;" id="captain-floor-summary">
+          Loading tables...
+        </div>
+      </div>
+
+      <button class="btn btn-secondary btn-sm" onclick="loadTablesData()" style="padding: 0.35rem 0.65rem; font-size: 0.78rem; font-weight: 700; border-radius: 8px;">
+        🔄 Refresh
+      </button>
+    </div>
+
+    <!-- Section Filter Pills -->
+    <div class="restro-category-pills" id="captain-section-pills" style="margin-bottom: 0.65rem; padding-bottom: 4px;">
+      <button class="restro-pill active" data-section="all" onclick="filterTablesBySection('all')">All Tables</button>
+    </div>
+
+    <!-- Tables Grid Container -->
+    <div class="captain-table-grid" id="captain-tables-container">
+      <!-- Populated dynamically -->
+    </div>
+  </main>
+
+  <!-- VIEW 2: Order Taking & Menu Catalog (for selected table) -->
+  <main id="captain-view-menu" class="captain-view hidden">
+    <!-- Selected Table Banner -->
+    <div style="background: #ffffff; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 0.65rem 0.85rem; margin-bottom: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 0.5rem;">
+        <button class="btn btn-secondary btn-sm" onclick="showTablesView()" style="padding: 0.35rem 0.6rem; border-radius: 8px; font-size: 0.8rem; font-weight: 800;">
+          ← Tables
+        </button>
+        <div>
+          <div style="font-size: 1.05rem; font-weight: 900; color: #0f172a;" id="selected-table-title">Table T-1</div>
+          <div style="font-size: 0.72rem; color: #64748b;" id="selected-table-status-label">Vacant Table</div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.35rem;">
+        <button class="btn btn-secondary btn-sm" id="btn-captain-shift-table" onclick="openCaptainShiftModal()" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; font-weight: 800; border-radius: 8px;">
+          🔀 Shift
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btn-captain-view-running" onclick="toggleRunningBillTab()" style="padding: 0.35rem 0.6rem; font-size: 0.75rem; font-weight: 800; border-radius: 8px;">
+          📋 Bill
+        </button>
+      </div>
+    </div>
+
+    <!-- Active Running Bill Preview Tab (Collapsible) -->
+    <div id="captain-running-items-card" class="hidden" style="background: #ffffff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 0.75rem 0.85rem; margin-bottom: 0.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="font-size: 0.76rem; font-weight: 800; color: #1d4ed8; text-transform: uppercase;">Current Items On Bill</span>
+        <button class="btn btn-secondary btn-sm" onclick="toggleRunningBillTab()" style="padding: 1px 6px; font-size: 0.72rem;">Close</button>
+      </div>
+      <div id="captain-running-items-list" style="display: flex; flex-direction: column; gap: 0.35rem; max-height: 200px; overflow-y: auto;">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+
+    <!-- Search & Dietary Filters -->
+    <div style="display: flex; gap: 0.45rem; margin-bottom: 0.5rem;">
+      <input type="text" id="captain-dish-search" class="form-input" style="flex: 1; font-size: 0.88rem; padding: 0.55rem 0.75rem; border-radius: 10px;" placeholder="🔍 Search biryani, starter, roti..." oninput="onSearchDishes(this.value)">
+      <div style="display: flex; gap: 0.25rem;">
+        <button class="restro-pill active" id="btn-diet-all" onclick="setDietaryFilter('all')" style="padding: 0.4rem 0.6rem; font-size: 0.75rem;">All</button>
+        <button class="restro-pill" id="btn-diet-veg" onclick="setDietaryFilter('veg')" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; color: #16a34a;">🟢 Veg</button>
+        <button class="restro-pill" id="btn-diet-non-veg" onclick="setDietaryFilter('non_veg')" style="padding: 0.4rem 0.6rem; font-size: 0.75rem; color: #dc2626;">🔴 Non</button>
+      </div>
+    </div>
+
+    <!-- Category Pills Strip -->
+    <div class="restro-category-pills" id="captain-category-pills" style="margin-bottom: 0.75rem; padding-bottom: 4px;">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- Dishes List -->
+    <div id="captain-dishes-container">
+      <!-- Populated dynamically -->
+    </div>
+  </main>
+
+  <!-- Sticky Bottom Bar for Ordering -->
+  <div class="captain-bottom-bar hidden" id="captain-bottom-bar">
+    <div>
+      <div style="font-size: 0.72rem; font-weight: 800; color: #64748b; text-transform: uppercase;">
+        <span id="captain-cart-count">0 items</span> for <strong id="captain-cart-table" style="color: #0f172a;">T-1</strong>
+      </div>
+      <div style="font-size: 1.15rem; font-weight: 900; color: #0f172a;" id="captain-cart-total">₹0.00</div>
+    </div>
+
+    <button class="captain-punch-btn" id="btn-punch-kot" onclick="punchCaptainOrder()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <span id="captain-punch-label">⚡ PUNCH KOT</span>
+    </button>
+  </div>
+
+  <!-- Modal: Shift Table in Captain Portal -->
+  <div class="modal-overlay hidden" id="modal-captain-shift" style="z-index: 300;">
+    <div class="modal-box" style="max-width: 420px; width: 92%;">
+      <div class="modal-header">
+        <h3 style="font-weight: 800; font-size: 1.05rem; margin: 0;">🔀 Shift Table</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeCaptainShiftModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1rem; display: flex; flex-direction: column; gap: 0.85rem;">
+        <div>
+          <label style="font-size: 0.78rem; font-weight: 700; color: #64748b;">Current Table:</label>
+          <div style="font-size: 1.1rem; font-weight: 800; color: #0f172a;" id="captain-shift-source-label">Table T-1</div>
+        </div>
+
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 800; color: #334155; margin-bottom: 0.35rem; display: block;">Destination Table:</label>
+          <select id="captain-shift-target-select" class="form-input" style="width: 100%; font-size: 0.95rem; font-weight: 700; padding: 0.65rem;" onchange="onCaptainShiftTargetChanged()">
+            <option value="">-- Choose destination table --</option>
+          </select>
+        </div>
+
+        <div id="captain-shift-conflict" class="hidden" style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 0.65rem; font-size: 0.8rem; font-weight: 700; color: #b45309;">
+          <div>⚠️ Target table is occupied!</div>
+          <div style="margin-top: 0.35rem; display: flex; gap: 0.75rem;">
+            <label><input type="radio" name="captain_shift_act" value="swap" checked> Swap</label>
+            <label><input type="radio" name="captain_shift_act" value="merge"> Merge Bills</label>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 0.85rem 1rem; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary btn-sm" onclick="closeCaptainShiftModal()">Cancel</button>
+        <button class="btn btn-primary btn-sm" onclick="confirmCaptainShift()">Confirm Shift</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/icons.js?v=3.5"></script>
+  <script src="/js/audio.js?v=3.5"></script>
+  <script src="/js/ws.js?v=3.5"></script>
+  <script src="/js/captain.js?v=3.5"></script>
+  <script src="/js/intercom.js?v=3.5"></script>
+</body>
+</html>

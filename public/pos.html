@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Point of Sale (POS) | Grand Palace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css?v=3.0">
+  <style>
+    /* Drawer */
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .drawer-overlay.hidden {
+      display: none !important;
+    }
+    .drawer-content {
+      background: #ffffff;
+      width: 580px;
+      max-width: 95vw;
+      height: 100%;
+      border-left: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-xl);
+      animation: slideInRight 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.85rem;
+      max-height: 440px;
+      overflow-y: auto;
+      padding: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Fullscreen RestroBit 3-Column Layout -->
+  <div class="restro-container">
+
+    <!-- 1. Left Sidebar -->
+    <aside class="restro-sidebar">
+      <div>
+        <!-- Brand Logo Header -->
+        <div class="restro-brand">
+          <div class="restro-brand-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
+          </div>
+          <div>
+            <div class="restro-brand-title" id="header-rest-name">RestroKOT</div>
+            <div style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Restaurant Suite</div>
+          </div>
+        </div>
+
+        <!-- User Profile Card -->
+        <div class="restro-user-card">
+          <div class="restro-avatar">M</div>
+          <div style="overflow: hidden;">
+            <div class="restro-user-title" style="font-size: 0.85rem; font-weight: 800; color: #0f172a; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;">Manager Desk</div>
+            <div class="restro-user-subtitle" style="font-size: 0.72rem; color: #16a34a; font-weight: 700;">● Active Terminal</div>
+          </div>
+        </div>
+
+        <!-- Main Navigation Links -->
+        <nav>
+          <div class="restro-nav-group" data-roles="manager">
+            <div class="restro-nav-header">POS & Floor</div>
+            <a href="/pos" class="restro-nav-link active">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
+              <span>Point of Sale (POS)</span>
+            </a>
+            <a href="javascript:void(0)" class="restro-nav-link" onclick="openTableModal()">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              <span>Dining Tables Floor</span>
+            </a>
+          </div>
+
+          <!-- Station Terminals Navigation -->
+          <div class="restro-nav-group">
+            <div class="restro-nav-header">Terminals & Displays</div>
+            <a href="/captain" class="restro-nav-link" data-roles="manager,service,captain">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Captain Order Desk</span>
+            </a>
+            <a href="/kitchen" class="restro-nav-link" data-roles="manager,kitchen">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <span>Kitchen KDS</span>
+            </a>
+            <a href="/service" class="restro-nav-link" data-roles="manager,service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+              <span>Service Area</span>
+            </a>
+            <a href="/display" target="_blank" class="restro-nav-link" data-roles="manager,kitchen,service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              <span>Customer TV 1</span>
+            </a>
+            <a href="/display?station=counter" target="_blank" class="restro-nav-link" data-roles="manager,kitchen,service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+              <span>Takeaway TV 2</span>
+            </a>
+          </div>
+
+          <!-- Back Office Navigation -->
+          <div class="restro-nav-group" data-roles="manager">
+            <div class="restro-nav-header">Management</div>
+            <a href="/owner" class="restro-nav-link" data-roles="manager,owner">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <span>Owner Desk</span>
+            </a>
+            <a href="/settings" class="restro-nav-link">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"/><path d="m14 2 2 4v16"/><path d="M2 15a4 4 0 0 0 8 0V2H2v13Z"/></svg>
+              <span>Dishes & Menu</span>
+            </a>
+            <a href="/launch" class="restro-nav-link">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Multi-Monitor Kiosk</span>
+            </a>
+            <a href="/settings" class="restro-nav-link">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Tax & Settings</span>
+            </a>
+          </div>
+        </nav>
+      </div>
+
+      <!-- Logout / Switch Station -->
+      <div>
+        <button class="restro-nav-link" onclick="logoutUser()" style="width: 100%; border: none; cursor: pointer; background: transparent; color: #ef4444;">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Staff Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 2. Main Content Center Panel -->
+    <main class="restro-main">
+      
+      <!-- Top Universal Header -->
+      <header class="restro-top-bar">
+        <div class="restro-search-box">
+          <input type="text" class="restro-search-input" id="menu-search-input" placeholder="Search (Ctrl+/)">
+          <span style="position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); display: flex; color: #94a3b8;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <span class="live-pill ws-status-pill"><span class="dot-pulse"></span> Instant Sync (0ms)</span>
+          <span class="user-role-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Manager
+          </span>
+        </div>
+      </header>
+
+      <!-- Main POS Content -->
+      <div class="restro-pos-content">
+
+        <!-- Title Row with Action Buttons (RestroBit Header Style) -->
+        <div class="restro-pos-title-bar">
+          <div>
+            <h1 class="restro-title">Point of Sale (POS)</h1>
+            <div class="restro-breadcrumb">Dashboard • Pos</div>
+          </div>
+
+          <div class="restro-actions-group">
+            <button class="btn-restro-orange" onclick="resetToNewOrder()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+              <span>+ New</span>
+            </button>
+            <button class="btn-restro-white" onclick="openTableModal()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+              <span>Table Order</span>
+            </button>
+            <button class="btn-restro-white" id="btn-open-orders-drawer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Running Bills (<span id="active-orders-count">0</span>)</span>
+            </button>
+            <a href="/settings?tab=reports&action=handover" class="btn-restro-white" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem; font-size: 0.82rem;" title="Record Daily Cash Handover">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 6v2m0 8v2"/></svg>
+              <span>Cash Handover</span>
+            </a>
+            <a href="/settings?tab=reports&action=settle" class="btn-restro-white" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.85rem; font-size: 0.82rem;" title="Daily Settlement / EOD Close">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Settle Day</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Filter Bar: Search, Category Dropdown, Type Dropdown -->
+        <div class="restro-filters-bar">
+          <div style="position: relative; flex: 1;">
+            <input type="text" id="filter-search-sub" class="restro-filter-input" placeholder="Search in products...">
+            <span style="position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: #94a3b8; display: flex;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+          </div>
+
+          <select class="restro-filter-select" id="filter-cat-select" onchange="onCategorySelectChange(this.value)">
+            <option value="all">All Category</option>
+          </select>
+
+          <select class="restro-filter-select" id="filter-diet-select" onchange="onDietarySelectChange(this.value)">
+            <option value="all">All Types</option>
+            <option value="veg">🟢 Veg Only</option>
+            <option value="non_veg">🔴 Non-Veg Only</option>
+            <option value="egg">🟡 Egg Only</option>
+          </select>
+        </div>
+
+        <!-- Category Horizontal Pills (Show All, Rice, Starters, etc.) -->
+        <div class="restro-category-pills" id="category-pills">
+          <button class="restro-pill active" data-category="all">Show All</button>
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Table Quick Selector Strip (Visible for Dine-In) -->
+        <div id="channel-metadata-bar">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Running Order Banner (shown when editing an active table) -->
+        <div class="running-order-banner hidden" id="running-order-banner">
+          <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;" class="dot-pulse"></span>
+            <strong style="color: #1d4ed8; font-size: 0.95rem;" id="banner-table-title">Table T-1 Running Order</strong>
+            <span style="color: var(--text-secondary); font-size: 0.82rem;" id="banner-table-subtitle">(Round 1 active)</span>
+          </div>
+          <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="openShiftTableModal()" title="Shift or swap table">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+              Shift Table
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="openEditOrderModal()" title="Edit quantities & void items">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+              Edit Order
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="viewRunningBillPrint()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+              View Bill
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="resetToNewOrder()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              New Table
+            </button>
+          </div>
+        </div>
+
+        <!-- Product Cards Grid (NO IMAGES AS REQUESTED) -->
+        <div class="restro-products-grid" id="menu-items-grid">
+          <!-- Populated dynamically -->
+        </div>
+
+      </div>
+
+    </main>
+
+    <!-- 3. Right Order Cart Panel (RestroBit Style) -->
+    <aside class="restro-cart-panel">
+
+      <!-- Top Header & Dropdowns -->
+      <div class="restro-cart-header">
+        <!-- Search in existing input -->
+        <div style="position: relative;">
+          <input type="text" id="search-existing-orders-input" class="restro-search-input" style="padding-left: 2.2rem; font-size: 0.82rem;" placeholder="Search in Existing">
+          <span style="position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); display: flex; color: #94a3b8;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+        </div>
+
+        <!-- Select Dining & Table Row -->
+        <div class="restro-cart-selects-row">
+          <select id="select-dining-mode" class="restro-cart-select" onchange="onDiningModeChange(this.value)">
+            <option value="dine_in">Dine-In</option>
+            <option value="takeaway">Take Away</option>
+            <option value="swiggy">Swiggy Delivery</option>
+            <option value="zomato">Zomato Delivery</option>
+          </select>
+
+          <select id="select-table-dropdown" class="restro-cart-select" onchange="onTableDropdownChange(this.value)">
+            <option value="">Select Table</option>
+          </select>
+        </div>
+
+        <!-- Order Number Bar -->
+        <div class="restro-order-tag-bar">
+          <div>
+            <div class="restro-order-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              <span id="ticket-table-token">Order #New</span>
+            </div>
+            <div id="ticket-captain-info" style="font-size: 0.72rem; color: #64748b; font-weight: 600; margin-left: 1.6rem; margin-top: 1px;">Waiter: Not assigned</div>
+          </div>
+          <span class="badge-channel badge-dine_in" id="ticket-channel-badge">Dine-In</span>
+        </div>
+      </div>
+
+      <!-- Scrollable Cart Items -->
+      <div class="restro-cart-items-scroll" id="cart-items-container">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Cart Financial Summary Breakdown -->
+      <div class="restro-cart-summary">
+        <div class="restro-sum-line">
+          <span>Sub total :</span>
+          <span id="calc-subtotal" style="font-weight: 700; color: #0f172a;">₹0.00</span>
+        </div>
+
+        <div class="restro-sum-line">
+          <span>Product Discount :</span>
+          <span id="calc-discount" style="color: #ea580c; font-weight: 700;">- ₹0.00</span>
+        </div>
+
+        <!-- Discount Preset Chips -->
+        <div class="discount-chips" style="margin: 0.2rem 0;">
+          <button class="disc-chip active" data-type="percent" data-val="0">0%</button>
+          <button class="disc-chip" data-type="percent" data-val="5">5%</button>
+          <button class="disc-chip" data-type="percent" data-val="10">10%</button>
+          <button class="disc-chip" data-type="fixed" data-val="50">₹50</button>
+          <button class="disc-chip" id="btn-custom-discount">Custom</button>
+        </div>
+
+        <div class="restro-sum-line">
+          <span>CGST (<span id="cgst-rate-lbl">2.5</span>%) :</span>
+          <span id="calc-cgst">₹0.00</span>
+        </div>
+
+        <div class="restro-sum-line">
+          <span>SGST (<span id="sgst-rate-lbl">2.5</span>%) :</span>
+          <span id="calc-sgst">₹0.00</span>
+        </div>
+
+        <div class="restro-sum-line" style="font-size: 0.78rem;">
+          <span>Round Off :</span>
+          <span id="calc-roundoff">₹0.00</span>
+        </div>
+
+        <!-- Grand Total Line (RestroBit Bold Style) -->
+        <div class="restro-sum-line total-line">
+          <span>Total :</span>
+          <span id="calc-grandtotal" style="font-size: 1.45rem; font-weight: 900; color: #0f172a;">₹0</span>
+        </div>
+
+        <!-- Special Instructions Input -->
+        <div style="margin-top: 0.35rem;">
+          <input type="text" id="order-special-notes" class="channel-input" style="width: 100%; font-size: 0.8rem;" placeholder="Add special instructions for kitchen...">
+        </div>
+
+        <!-- Payment Method Selector -->
+        <div class="payment-tiles-grid" id="payment-tiles-group" style="margin-top: 0.5rem; margin-bottom: 0;">
+          <div class="payment-tile active" data-mode="cash">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+            <span class="tile-label">Cash</span>
+          </div>
+          <div class="payment-tile" data-mode="upi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/></svg>
+            <span class="tile-label">UPI / QR</span>
+          </div>
+          <div class="payment-tile" data-mode="card">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            <span class="tile-label">Card</span>
+          </div>
+          <div class="payment-tile" data-mode="online">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/></svg>
+            <span class="tile-label">Online</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Action Buttons Group (RestroBit Exact Tri-Button Layout) -->
+      <div class="restro-cart-actions">
+        <!-- 1. KOT & Print (Dark Button) -->
+        <button class="btn-kot-print" id="btn-punch-kot">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          <span id="btn-punch-label">KOT & Print</span>
+        </button>
+
+        <!-- 2. Dual Action Row: Bill & Payment (Orange) | Bill & Print (Green) -->
+        <div class="restro-bottom-dual-btns">
+          <button class="btn-bill-pay" id="btn-bill-payment" onclick="openSettlePaymentModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+            <span>Bill & Payment</span>
+          </button>
+          <button class="btn-bill-print" id="btn-print-bill">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+            <span>Bill & Print</span>
+          </button>
+        </div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- Table Selection & Floor Map Modal -->
+  <div class="modal-overlay hidden" id="table-modal">
+    <div class="modal-box" style="max-width: 860px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 0.85rem;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 800; color: #0f172a;">Dining Tables Floor & Management</h3>
+          <span style="font-size: 0.78rem; color: #64748b;">Select tables for order/billing, or add and edit restaurant tables</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <button class="btn-restro-orange" onclick="openAddEditTableModal()" style="padding: 0.45rem 0.95rem; font-size: 0.85rem;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+            <span>+ Add New Table</span>
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="closeTableModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- Section Filter Pills -->
+      <div style="padding: 0.75rem 1.25rem 0 1.25rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="restro-category-pills" id="modal-table-section-pills" style="margin-bottom: 0; padding-bottom: 0;">
+          <button class="restro-pill active" onclick="filterTableSectionModal('all')">All Sections</button>
+        </div>
+        <div style="display: flex; gap: 1rem; font-size: 0.82rem; font-weight: 600;">
+          <span style="display: flex; align-items: center; gap: 0.35rem; color: #15803d;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #22c55e;"></span> Vacant</span>
+          <span style="display: flex; align-items: center; gap: 0.35rem; color: #c2410c;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #ea580c;"></span> Seated (Bill Active)</span>
+        </div>
+      </div>
+
+      <div class="modal-body" style="padding: 1rem 1.25rem; overflow-y: auto; flex: 1;">
+        <div class="tables-grid" id="tables-grid-container" style="grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.85rem;">
+          <!-- Populated dynamically with modern cards -->
+        </div>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid #e2e8f0;">
+        <button class="btn btn-secondary" onclick="closeTableModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add / Edit Table Modal -->
+  <div class="modal-overlay hidden" id="table-form-modal" style="z-index: 250;">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 id="table-form-title" style="font-size: 1.15rem; font-weight: 800; color: #0f172a;">Add New Dining Table</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeAddEditTableModal()">✕</button>
+      </div>
+      <form id="table-crud-form" onsubmit="handleTableFormSubmit(event)">
+        <input type="hidden" id="form-table-id" value="">
+        <div class="modal-body" style="display: flex; flex-direction: column; gap: 1rem; padding: 1.25rem;">
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Table Identifier / Name *</label>
+            <input type="text" id="form-table-name" class="channel-input" required placeholder="e.g. T-13, VIP-3, Table 8" style="font-weight: 700; font-size: 1rem;">
+            <small style="color: #64748b; font-size: 0.75rem;">Short unique identifier used on KOTs and bills</small>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Floor / Dining Section</label>
+            <input type="text" id="form-table-section" list="table-section-datalist" class="channel-input" placeholder="e.g. AC Hall, Rooftop, Garden" value="AC Hall">
+            <datalist id="table-section-datalist">
+              <option value="AC Hall">
+              <option value="Main Dining">
+              <option value="Garden Outdoor">
+              <option value="Rooftop Lounge">
+              <option value="Private Dining (VIP)">
+              <option value="Family AC Cabin">
+            </datalist>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 0.85rem; font-weight: 700; color: #0f172a;">Seating Capacity</label>
+            <input type="number" id="form-table-capacity" class="channel-input" min="1" max="100" value="4">
+          </div>
+        </div>
+        <div class="modal-footer" style="gap: 0.5rem; justify-content: flex-end;">
+          <button type="button" class="btn btn-secondary" onclick="closeAddEditTableModal()">Cancel</button>
+          <button type="submit" class="btn-restro-orange" style="padding: 0.6rem 1.25rem;">Save Table</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Discount Modal -->
+  <div class="modal-overlay hidden" id="discount-modal">
+    <div class="modal-box" style="max-width: 380px;">
+      <div class="modal-header">
+        <h3 style="font-weight: 800; color: #0f172a;">Custom Discount</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeDiscountModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.85rem; margin-bottom: 0.4rem; color: var(--text-secondary); font-weight: 600;">Discount Mode</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <button class="btn btn-secondary btn-sm" id="btn-mode-percent" style="flex: 1;" onclick="setCustomDiscountMode('percentage')">Percentage (%)</button>
+            <button class="btn btn-secondary btn-sm" id="btn-mode-fixed" style="flex: 1;" onclick="setCustomDiscountMode('fixed')">Fixed Amount (₹)</button>
+          </div>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.85rem; margin-bottom: 0.4rem; color: var(--text-secondary); font-weight: 600;" id="custom-disc-label">Discount Value (%)</label>
+          <input type="number" id="custom-disc-input" class="channel-input" style="width: 100%; font-size: 1.1rem; font-weight: bold;" placeholder="0" min="0" step="0.5">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeDiscountModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="applyCustomDiscount()">Apply Discount</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Running Bills Drawer -->
+  <div class="drawer-overlay hidden" id="orders-drawer">
+    <div class="drawer-content">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-primary);">Running Tables & Active Bills</h3>
+          <span style="font-size: 0.75rem; color: var(--text-secondary);">Single consolidated bill per table. Click "Add Items / Round 2" to append.</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="closeOrdersDrawer()">✕</button>
+      </div>
+      <div style="padding: 0.75rem 1.25rem; background: #ffffff; border-bottom: 1px solid var(--border-color); display: flex; gap: 0.5rem; overflow-x: auto;">
+        <button class="btn btn-secondary btn-sm active" id="drawer-filter-all" onclick="filterDrawerOrders('all')">All</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterDrawerOrders('dine_in')">Dine-In</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterDrawerOrders('takeaway')">Takeaway</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterDrawerOrders('swiggy')">Swiggy</button>
+        <button class="btn btn-secondary btn-sm" onclick="filterDrawerOrders('zomato')">Zomato</button>
+      </div>
+      <div class="modal-body" id="drawer-orders-list" style="background: #f8fafc; padding: 1.1rem;">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Thermal Print Modal / Receipt View -->
+  <div class="modal-overlay hidden" id="print-modal">
+    <div class="modal-box" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 style="font-weight: 800;">Consolidated Tax Invoice</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closePrintModal()">✕</button>
+      </div>
+      <div class="modal-body" style="background: white; color: black; font-family: monospace; padding: 1.5rem; border-radius: 8px;" id="thermal-receipt-area">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closePrintModal()">Close</button>
+        <button class="btn btn-primary" onclick="window.print()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          Print Receipt (80mm)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Shift Table / Table Transfer -->
+  <div class="modal-overlay hidden" id="modal-shift-table" style="z-index: 260;">
+    <div class="modal-box" style="max-width: 500px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div style="background: #eff6ff; color: #1d4ed8; padding: 6px; border-radius: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+          </div>
+          <div>
+            <h3 style="font-weight: 800; font-size: 1.1rem; margin: 0;">Shift / Transfer Table</h3>
+            <div style="font-size: 0.78rem; color: #64748b;">Move guests and active KOTs to another table</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="closeShiftTableModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Current Source Table Info -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.85rem 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Current Table</div>
+            <div style="font-size: 1.15rem; font-weight: 800; color: #0f172a;" id="shift-source-table-label">Table T-1</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 0.75rem; color: #64748b;" id="shift-source-bill-label">Bill #...</div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #16a34a;" id="shift-source-total-label">₹0.00</div>
+          </div>
+        </div>
+
+        <!-- Target Table Selector -->
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 800; color: #334155; margin-bottom: 0.35rem; display: block;">Select Destination Table:</label>
+          <select id="shift-target-table-select" class="form-input" style="width: 100%; font-size: 0.95rem; font-weight: 700; padding: 0.65rem;" onchange="onShiftTargetTableChanged()">
+            <option value="">-- Choose destination table --</option>
+          </select>
+        </div>
+
+        <!-- Conflict Resolution Option (Shown only if target is occupied) -->
+        <div id="shift-conflict-box" class="hidden" style="background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 10px; padding: 0.85rem;">
+          <div style="font-size: 0.82rem; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.5rem;">
+            <span>⚠️ Target Table is currently occupied!</span>
+          </div>
+          <div style="display: flex; gap: 1rem; font-size: 0.85rem; font-weight: 700;">
+            <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="radio" name="shift_action_type" value="swap" checked> 🔄 Swap Tables
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.35rem; cursor: pointer;">
+              <input type="radio" name="shift_action_type" value="merge"> 🔗 Merge Orders into Target
+            </label>
+          </div>
+        </div>
+
+        <!-- Reason Input -->
+        <div>
+          <label style="font-size: 0.8rem; font-weight: 700; color: #64748b; margin-bottom: 0.3rem; display: block;">Reason / Note (Optional):</label>
+          <input type="text" id="shift-reason-input" class="form-input" style="width: 100%; font-size: 0.85rem;" placeholder="e.g. Guest requested AC section / larger seating">
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 1rem 1.25rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="closeShiftTableModal()">Cancel</button>
+        <button class="btn btn-primary" id="btn-confirm-shift-table" onclick="confirmShiftTable()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Confirm Table Shift
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Running Order (Items, Qty, Discounts, Notes) -->
+  <div class="modal-overlay hidden" id="modal-edit-order" style="z-index: 260;">
+    <div class="modal-box" style="max-width: 620px; max-height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <div style="background: #fef2f2; color: #dc2626; padding: 6px; border-radius: 8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <div>
+            <h3 style="font-weight: 800; font-size: 1.1rem; margin: 0;">Edit Running Order</h3>
+            <div style="font-size: 0.78rem; color: #64748b;" id="edit-order-modal-subtitle">Modify items, quantities, or void dishes</div>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="closeEditOrderModal()">✕</button>
+      </div>
+      <div class="modal-body" style="padding: 1.25rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 1rem;">
+        <!-- Order Items List -->
+        <div>
+          <div style="font-size: 0.78rem; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
+            <span>Ordered Dishes</span>
+            <span>Adjust Qty or Void</span>
+          </div>
+          <div id="edit-order-items-container" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Order Meta: Captain & Notes -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: block;">Captain Name</label>
+            <input type="text" id="edit-order-waiter-input" class="form-input" style="width: 100%; font-size: 0.85rem;" placeholder="Captain name">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: block;">Customer Mobile</label>
+            <input type="text" id="edit-order-phone-input" class="form-input" style="width: 100%; font-size: 0.85rem;" placeholder="Phone (optional)">
+          </div>
+        </div>
+
+        <!-- Special Notes -->
+        <div>
+          <label style="font-size: 0.78rem; font-weight: 700; color: #475569; margin-bottom: 0.25rem; display: block;">Table / Order Instructions</label>
+          <input type="text" id="edit-order-notes-input" class="form-input" style="width: 100%; font-size: 0.85rem;" placeholder="Special instructions for kitchen or billing">
+        </div>
+
+        <!-- Financial Summary Preview -->
+        <div style="background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.85rem; font-size: 0.85rem;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+            <span style="color: #64748b;">Subtotal:</span>
+            <span style="font-weight: 700;" id="edit-order-subtotal-val">₹0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+            <span style="color: #64748b;">GST (CGST + SGST):</span>
+            <span style="font-weight: 700;" id="edit-order-tax-val">₹0.00</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 1rem; font-weight: 800; color: #0f172a; border-top: 1px dashed #cbd5e1; padding-top: 0.35rem; margin-top: 0.35rem;">
+            <span>Estimated Grand Total:</span>
+            <span style="color: #16a34a;" id="edit-order-grand-total-val">₹0.00</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 1rem 1.25rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.5rem;">
+        <button class="btn btn-secondary" onclick="closeEditOrderModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveOrderEdits()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Save Order Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/icons.js?v=3.0"></script>
+  <script src="/js/audio.js?v=3.0"></script>
+  <script src="/js/ws.js?v=3.0"></script>
+  <script src="/js/pos.js?v=3.0"></script>
+  <script src="/js/intercom.js?v=3.3"></script>
+</body>
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RestroKOT — Owner Executive Portal & Daily Sales</title>
+  <link rel="stylesheet" href="/css/style.css?v=3.2">
+  <style>
+    :root {
+      --owner-gold: #f59e0b;
+      --owner-navy: #0f172a;
+    }
+    body {
+      background: #f1f5f9;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .owner-header {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(15,23,42,0.12);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .owner-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .owner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+      padding: 0.25rem 0.65rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .owner-container {
+      max-width: 1400px;
+      margin: 1.5rem auto;
+      padding: 0 1.25rem 3rem 1.25rem;
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .kpi-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1.25rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+    .kpi-card.kpi-green::before { background: #22c55e; }
+    .kpi-card.kpi-blue::before { background: #3b82f6; }
+    .kpi-card.kpi-gold::before { background: #f59e0b; }
+    .kpi-card.kpi-purple::before { background: #8b5cf6; }
+
+    .kpi-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .kpi-value {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0.4rem 0 0.2rem 0;
+    }
+    .kpi-sub {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      font-weight: 600;
+    }
+
+    .breakdown-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .breakdown-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 1.25rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .breakdown-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .bar-row {
+      margin-bottom: 0.85rem;
+    }
+    .bar-row-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.84rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+    .bar-track {
+      background: #f1f5f9;
+      border-radius: 6px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 6px;
+      transition: width 0.4s ease;
+    }
+
+    .owner-nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 1.25rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .owner-tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.75rem 1.1rem;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .owner-tab-btn:hover {
+      color: #0f172a;
+    }
+    .owner-tab-btn.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    .restro-table-modern {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    .restro-table-modern th {
+      background: #f8fafc;
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 2px solid #e2e8f0;
+      color: #64748b;
+      font-weight: 800;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .restro-table-modern td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid #edf2f7;
+      vertical-align: middle;
+    }
+    .restro-table-modern tr:hover {
+      background: #fbfcfd;
+    }
+
+    .date-pill-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .date-pill-btn:hover, .date-pill-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    /* Modal styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(15,23,42,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    }
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Executive Navigation Bar -->
+  <header class="owner-header">
+    <div class="owner-brand">
+      <div style="background: #f59e0b; color: #fff; width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; font-weight: 900; box-shadow: 0 4px 10px rgba(245,158,11,0.3);">
+        👑
+      </div>
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.15rem; font-weight: 900; color: #fff;" id="restro-name-header">Grand Palace Restaurant</span>
+          <span class="owner-badge">Owner Desk</span>
+        </div>
+        <div style="font-size: 0.75rem; color: #94a3b8;">Executive Daily Sales & Real-Time Performance Portal</div>
+      </div>
+    </div>
+
+    <!-- Date Strip & Controls -->
+    <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+      
+      <div style="display: flex; align-items: center; gap: 0.35rem; background: rgba(0,0,0,0.25); padding: 3px; border-radius: 8px;">
+        <button type="button" class="date-pill-btn active" id="btn-date-today" onclick="setOwnerDatePreset('today')">Today</button>
+        <button type="button" class="date-pill-btn" id="btn-date-yesterday" onclick="setOwnerDatePreset('yesterday')">Yesterday</button>
+        <button type="button" class="date-pill-btn" id="btn-date-30days" onclick="switchOwnerTab('history')">30-Day Trend</button>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.4rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 0.3rem 0.6rem;">
+        <span style="font-size: 0.82rem; color: #cbd5e1;">📅</span>
+        <input type="date" id="owner-date-input" onchange="onOwnerDateChanged()" 
+               style="background: transparent; border: none; color: #fff; font-weight: 700; font-size: 0.85rem; outline: none; cursor: pointer;">
+      </div>
+
+      <button type="button" onclick="loadOwnerDashboard()" 
+              style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <span>Refresh</span>
+      </button>
+
+      <button type="button" onclick="logoutOwner()" 
+              style="background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 700; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+        <span>Logout ⎋</span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="owner-container">
+
+    <!-- Top KPI Cards -->
+    <div class="kpi-grid">
+      
+      <!-- Net Sales -->
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">
+          <span>Net Sales (Revenue)</span>
+          <span style="background: #dcfce7; color: #16a34a; font-size: 0.72rem; padding: 1px 6px; border-radius: 4px; font-weight: 800;">LIVE</span>
+        </div>
+        <div class="kpi-value" id="kpi-net-sales">₹0.00</div>
+        <div class="kpi-sub">
+          Gross: <span id="kpi-gross-sales">₹0</span> • Tax: <span id="kpi-tax-amount">₹0</span>
+        </div>
+      </div>
+
+      <!-- Paid Bills -->
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">
+          <span>Bills Settled</span>
+          <span>🧾</span>
+        </div>
+        <div class="kpi-value" id="kpi-paid-bills">0</div>
+        <div class="kpi-sub">
+          Avg Bill Value (AOV): <strong id="kpi-aov" style="color: #2563eb;">₹0.00</strong>
+        </div>
+      </div>
+
+      <!-- Cash Drawer Reconciliation -->
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">
+          <span>Cash in Drawer</span>
+          <span>💵</span>
+        </div>
+        <div class="kpi-value" id="kpi-cash-total">₹0.00</div>
+        <div class="kpi-sub" id="kpi-cash-sub">
+          Expected vs Actual: Matching (₹0.00)
+        </div>
+      </div>
+
+      <!-- Running / Unpaid Orders -->
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-label">
+          <span>Running Active Tables</span>
+          <span>🍽️</span>
+        </div>
+        <div class="kpi-value" id="kpi-running-tables">0</div>
+        <div class="kpi-sub">
+          Open Running Total: <strong id="kpi-running-amount" style="color: #8b5cf6;">₹0.00</strong>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Revenue Breakdown Row (Payment Modes & Order Channels) -->
+    <div class="breakdown-grid">
+      
+      <!-- Payment Modes Breakdown -->
+      <div class="breakdown-card">
+        <div class="breakdown-title">
+          <span>💳</span>
+          <span>Payment Modes Collected</span>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-row-header">
+            <span style="display: flex; align-items: center; gap: 0.35rem;">
+              <span>💵 Cash Sales</span>
+            </span>
+            <span id="txt-cash-sales">₹0.00 (0%)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-cash" style="width: 0%; background: #16a34a;"></div>
+          </div>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-row-header">
+            <span style="display: flex; align-items: center; gap: 0.35rem;">
+              <span>📱 UPI / QR Code</span>
+            </span>
+            <span id="txt-upi-sales">₹0.00 (0%)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-upi" style="width: 0%; background: #3b82f6;"></div>
+          </div>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-row-header">
+            <span style="display: flex; align-items: center; gap: 0.35rem;">
+              <span>💳 Credit / Debit Card</span>
+            </span>
+            <span id="txt-card-sales">₹0.00 (0%)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-card" style="width: 0%; background: #f59e0b;"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Order Channel Breakdown -->
+      <div class="breakdown-card">
+        <div class="breakdown-title">
+          <span>🍽️</span>
+          <span>Sales by Order Channel</span>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-row-header">
+            <span>🍽️ Dine-In Table Bills</span>
+            <span id="txt-dinein-sales">₹0.00 (0 bills)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-dinein" style="width: 0%; background: #8b5cf6;"></div>
+          </div>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-row-header">
+            <span>🥡 Takeaway Counter</span>
+            <span id="txt-takeaway-sales">₹0.00 (0 bills)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-takeaway" style="width: 0%; background: #06b6d4;"></div>
+          </div>
+        </div>
+
+        <div class="bar-row">
+          <div class="bar-row-header">
+            <span>🛵 Swiggy & Zomato Delivery</span>
+            <span id="txt-delivery-sales">₹0.00 (0 bills)</span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" id="bar-delivery" style="width: 0%; background: #ec4899;"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Navigation Tabs for Detailed Registers -->
+    <div class="owner-nav-tabs">
+      <button type="button" class="owner-tab-btn active" id="tab-btn-bills" onclick="switchOwnerTab('bills')">
+        <span>🧾 All Bills for Selected Day</span>
+      </button>
+      <button type="button" class="owner-tab-btn" id="tab-btn-settlement" onclick="switchOwnerTab('settlement')">
+        <span>🌙 Daily Settlement (Z-Report Audit)</span>
+      </button>
+      <button type="button" class="owner-tab-btn" id="tab-btn-handover" onclick="switchOwnerTab('handover')">
+        <span>🤝 Cash Handover Register</span>
+      </button>
+      <button type="button" class="owner-tab-btn" id="tab-btn-history" onclick="switchOwnerTab('history')">
+        <span>📈 30-Day Historical Trend</span>
+      </button>
+      <button type="button" class="owner-tab-btn" id="tab-btn-cloud" onclick="switchOwnerTab('cloud')">
+        <span>☁️ Cloud Backup Status</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: Bills Register -->
+    <section id="owner-view-bills">
+      <div class="breakdown-card" style="padding: 1.5rem;">
+        
+        <!-- Search & Channel Filter Strip -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;">
+            <input type="text" id="owner-bill-search" placeholder="Search bill #, token, table..." oninput="filterOwnerBillsTable()"
+                   style="padding: 0.5rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem; width: 240px;">
+            <select id="owner-channel-filter" onchange="filterOwnerBillsTable()"
+                    style="padding: 0.5rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem;">
+              <option value="all">All Channels</option>
+              <option value="dine_in">Dine-In</option>
+              <option value="takeaway">Takeaway</option>
+              <option value="swiggy">Swiggy</option>
+              <option value="zomato">Zomato</option>
+            </select>
+            <select id="owner-status-filter" onchange="filterOwnerBillsTable()"
+                    style="padding: 0.5rem 0.85rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.88rem;">
+              <option value="all">All Payment Status</option>
+              <option value="paid">Paid Bills Only</option>
+              <option value="unpaid">Running / Unpaid Tables</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+
+          <div style="font-size: 0.85rem; color: #64748b; font-weight: 700;">
+            Showing: <strong id="owner-bills-count" style="color: #0f172a;">0 bills</strong>
+          </div>
+        </div>
+
+        <!-- Bills Table -->
+        <div style="overflow-x: auto;">
+          <table class="restro-table-modern">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Bill # / Token</th>
+                <th style="width: 90px;">Time</th>
+                <th>Table / Channel</th>
+                <th>Items Ordered</th>
+                <th>Payment Mode</th>
+                <th>Total (₹)</th>
+                <th style="text-align: right; width: 120px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="owner-bills-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TAB 2: Daily Settlement & Z-Report Audit -->
+    <section id="owner-view-settlement" class="hidden">
+      <div class="breakdown-card" id="owner-settlement-container" style="padding: 1.5rem;">
+        <!-- Dynamically rendered -->
+      </div>
+    </section>
+
+    <!-- TAB 3: Cash Handover Register -->
+    <section id="owner-view-handover" class="hidden">
+      <div class="breakdown-card" id="owner-handover-container" style="padding: 1.5rem;">
+        <!-- Dynamically rendered -->
+      </div>
+    </section>
+
+    <!-- TAB 4: 30-Day Historical Trend -->
+    <section id="owner-view-history" class="hidden">
+      <div class="breakdown-card" style="padding: 1.5rem;">
+        <div style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 1rem;">
+          📈 30-Day Historical Sales Performance
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="restro-table-modern">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Total Revenue (₹)</th>
+                <th>Bills Settled</th>
+                <th>Cash (₹)</th>
+                <th>UPI (₹)</th>
+                <th>Card (₹)</th>
+                <th>Tax / GST (₹)</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="owner-history-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: Cloud Backup Status -->
+    <section id="owner-view-cloud" class="hidden">
+      <div class="breakdown-card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <div style="font-size: 1.1rem; font-weight: 800; color: #0f172a;">☁️ Cloud Backup & Data Security</div>
+            <div style="font-size: 0.82rem; color: #64748b;">Live protection of restaurant records on the cloud.</div>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="triggerOwnerCloudPush()" id="btn-owner-push"
+                  style="background: #2563eb; color: #fff; font-weight: 700; padding: 0.6rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem;">
+            <span>☁️ Take Instant Cloud Snapshot</span>
+          </button>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 1.25rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+          <div>
+            <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Cloud Status</div>
+            <div style="font-size: 1rem; font-weight: 800; color: #16a34a; margin-top: 4px;" id="owner-cloud-status">🟢 Protected & Active</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Last Pushed Snapshot</div>
+            <div style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-top: 4px;" id="owner-cloud-lastpush">Loading...</div>
+          </div>
+          <div>
+            <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Total Available Snapshots</div>
+            <div style="font-size: 1rem; font-weight: 800; color: #2563eb; margin-top: 4px;" id="owner-cloud-count">0 Backups</div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="restro-table-modern">
+            <thead>
+              <tr>
+                <th>Backup File</th>
+                <th>Trigger</th>
+                <th>Size</th>
+                <th>Recorded Sales (₹)</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="owner-cloud-backups-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- View Bill Invoice Modal -->
+  <div class="modal-overlay hidden" id="owner-invoice-modal">
+    <div class="modal-box">
+      <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-size: 1.15rem; font-weight: 800; color: #0f172a;" id="modal-bill-title">Tax Invoice</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeOwnerInvoiceModal()" style="border: none; background: #f1f5f9; padding: 0.4rem 0.75rem; border-radius: 6px; cursor: pointer; font-weight: 800;">✕</button>
+      </div>
+      <div id="modal-invoice-content" style="padding: 1.5rem;">
+        <!-- Rendered invoice receipt -->
+      </div>
+      <div style="padding: 1rem 1.5rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeOwnerInvoiceModal()">Close</button>
+        <button type="button" class="btn btn-primary" onclick="printInvoiceModalContent()" style="background: #2563eb; color: #fff; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 700; border: none; cursor: pointer;">🖨️ Print Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/owner.js?v=1.0"></script>
+</body>
+</html>

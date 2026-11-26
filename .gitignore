@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+dist/
+build/
+data/*.db
+data/*.db-wal
+data/*.db-shm
+data/*.bak
+data/auto_backups/
+data/cloud_vault/
+.DS_Store
