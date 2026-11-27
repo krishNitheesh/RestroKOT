@@ -29,6 +29,28 @@ jobs:
       - name: Build RestroKOT folder (.exe)
         run: pyinstaller RestroKOT.spec --noconfirm --clean
 
+      - name: Smoke-test RestroKOT_Portable.exe on Windows
+        shell: pwsh
+        run: |
+          $proc = Start-Process -FilePath "dist\RestroKOT_Portable.exe" -PassThru
+          $ok = $false
+          for ($i = 0; $i -lt 30; $i++) {
+            Start-Sleep -Seconds 1
+            try {
+              $resp = Invoke-WebRequest -Uri "http://127.0.0.1:3000/login" -UseBasicParsing -TimeoutSec 2
+              if ($resp.StatusCode -eq 200) {
+                Write-Host "RestroKOT_Portable.exe responded HTTP 200 on /login!"
+                $ok = $true
+                break
+              }
+            } catch {}
+          }
+          Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+          if (-not $ok) {
+            Write-Error "RestroKOT_Portable.exe failed to respond on port 3000!"
+            exit 1
+          }
+
       - name: Upload Windows .exe Artifacts
         uses: actions/upload-artifact@v4
         with:

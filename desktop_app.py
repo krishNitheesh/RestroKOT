@@ -151,4 +151,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as exc:
+        import traceback
+        traceback.print_exc()
+        logging.exception(f"Fatal error in desktop_app: {exc}")
+        try:
+            input("\n[RestroKOT Error] Press Enter to close...")
+        except Exception:
+            pass
+        sys.exit(1)
