@@ -2298,8 +2298,22 @@ body.mobile-nav-open .mobile-nav-backdrop {
     padding: 0.5rem 0.75rem;
     height: auto;
     min-height: 52px;
-    gap: 0.4rem;
+    gap: 0.45rem;
     flex-wrap: wrap;
+  }
+  .restro-search-box {
+    flex: 1 1 160px;
+    min-width: 140px;
+    max-width: none;
+  }
+  .restro-category-pills {
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .restro-actions-group {
+    flex-wrap: wrap;
+    width: 100%;
   }
   .restro-cart-panel {
     width: 100% !important;
