@@ -2460,7 +2460,7 @@ async function loadCloudTab() {
 
     const providerEl = document.getElementById('cloud-provider-text');
     if (providerEl) {
-      providerEl.textContent = cfg.provider === 'webhook_http' ? 'Custom Cloud Webhook' : 'RestroKOT Cloud Vault';
+      providerEl.textContent = cfg.cloud_api_key ? 'KNITE KOT Cloud' : 'KNITE KOT Cloud (Not Connected)';
     }
 
     const resolvedDirEl = document.getElementById('cloud-resolved-dir');
@@ -2470,7 +2470,7 @@ async function loadCloudTab() {
 
     // Populate configuration form
     const selProvider = document.getElementById('cloud-form-provider');
-    if (selProvider) selProvider.value = cfg.provider || 'cloud_vault';
+    if (selProvider) selProvider.value = cfg.provider || 'webhook_http';
 
     const inVaultPath = document.getElementById('cloud-form-vault-path');
     if (inVaultPath) inVaultPath.value = cfg.vault_path || '';
@@ -2485,6 +2485,9 @@ async function loadCloudTab() {
     if (chkAutoHourly) chkAutoHourly.checked = Boolean(cfg.auto_hourly);
 
     toggleCloudProviderFields();
+    if (typeof window.checkCloudApprovalStatus === 'function') {
+      await window.checkCloudApprovalStatus();
+    }
     await loadCloudBackupsList();
   } catch (err) {
     console.error('loadCloudTab error:', err);

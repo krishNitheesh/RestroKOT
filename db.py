@@ -352,27 +352,29 @@ def init_db():
         if col_name not in existing_settle_cols:
             c.execute(f"ALTER TABLE daily_settlements ADD COLUMN {col_name} {col_type}")
 
-    # Seed default settings
+    # Seed default settings (clean fresh install - no dummy restaurant or cloud keys)
     default_settings = [
-        ('restaurant_name', 'Grand Palace Hotel & Restaurant'),
-        ('tagline', 'Authentic Taste & Quality Hospitality'),
-        ('address', '124, Commercial Road, Central District'),
-        ('phone', '+91 98765 43210'),
-        ('gstin', '33AABCU9603R1ZM'),
-        ('fssai', '12423008000451'),
+        ('restaurant_name', 'My Restaurant'),
+        ('tagline', ''),
+        ('address', ''),
+        ('phone', ''),
+        ('gstin', ''),
+        ('fssai', ''),
         ('currency_symbol', '₹'),
         ('cgst_rate', '2.5'),
         ('sgst_rate', '2.5'),
         ('token_counter_start', '101'),
-        ('upi_id', 'grandpalace@upi'),
-        ('cloud_provider', 'cloud_vault'),
+        ('upi_id', ''),
+        ('cloud_provider', 'webhook_http'),
         ('cloud_vault_path', ''),
         ('cloud_endpoint_url', ''),
+        ('cloud_shop_id', ''),
         ('cloud_api_key', ''),
         ('cloud_auto_settle', '1'),
-        ('cloud_auto_hourly', '0'),
+        ('cloud_auto_hourly', '1'),
         ('cloud_last_push', ''),
         ('cloud_last_pull', ''),
+        ('menu_seeded', '1'),
     ]
     for k, v in default_settings:
         c.execute("INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)", (k, v))
