@@ -2965,6 +2965,41 @@ def _sync_approval_from_cloud(shop_id: str) -> dict:
         return {'registered': True, 'approved': False, 'error': str(e)}
 
 
+@app.route('/api/system/factory-reset', methods=['POST'])
+@login_required(allowed_roles=['manager'])
+def api_factory_reset():
+    """Wipe all dishes, orders, settlements, messages, and cloud sync state for a fresh start."""
+    conn = db.get_db()
+    with conn:
+        for tbl in [
+            'order_items', 'kot_tickets', 'orders', 'menu_items',
+            'daily_settlements', 'cash_handovers', 'cloud_backups', 'messages'
+        ]:
+            try:
+                conn.execute(f"DELETE FROM {tbl}")
+                conn.execute("DELETE FROM sqlite_sequence WHERE name = ?", (tbl,))
+            except Exception:
+                pass
+        conn.execute("UPDATE settings SET value = 'My Restaurant' WHERE key = 'restaurant_name'")
+        conn.execute(
+            "DELETE FROM settings WHERE key IN ('cloud_shop_id','cloud_endpoint_url','cloud_api_key','cloud_last_push','cloud_last_pull','upi_qr_url')"
+        )
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('upi_id', '')")
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('menu_seeded', '1')")
+    conn.close()
+
+    for folder in (get_cloud_vault_dir(), os.path.join(db.DB_DIR, 'auto_backups')):
+        if os.path.isdir(folder):
+            for fn in os.listdir(folder):
+                fp = os.path.join(folder, fn)
+                if os.path.isfile(fp):
+                    try:
+                        os.remove(fp)
+                    except OSError:
+                        pass
+    return jsonify({'success': True, 'message': 'POS reset to fresh empty state!'})
+
+
 @app.route('/api/cloud/register', methods=['POST'])
 @login_required(allowed_roles=['manager'])
 def register_pos_to_cloud():
