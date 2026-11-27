@@ -16,21 +16,39 @@
       justify-content: center;
       min-height: 100vh;
       padding: 1.5rem;
+      margin: 0;
     }
     .login-card {
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 20px;
       padding: 2.25rem 1.75rem;
-      max-width: 490px;
+      max-width: 460px;
       width: 100%;
+      box-sizing: border-box;
       box-shadow: var(--shadow-xl);
     }
     .role-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.4rem;
-      margin: 1.5rem 0;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin: 1.35rem 0;
+    }
+    @media (max-width: 480px) {
+      body {
+        padding: 0.75rem;
+      }
+      .login-card {
+        padding: 1.5rem 1.15rem;
+        border-radius: 16px;
+      }
+      .role-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+      .role-btn {
+        padding: 0.75rem 0.5rem;
+      }
     }
     .role-btn {
       background: #f8fafc;
@@ -124,15 +142,16 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2v20"/><path d="m14 2 2 4v16"/><path d="M2 15a4 4 0 0 0 8 0V2H2v13Z"/></svg>
       </div>
       <h2 style="font-size: 1.4rem; color: var(--text-primary); font-weight: 800;">Grand Palace KOT</h2>
-      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Select station role & enter PIN</p>
+      <p id="login-subtitle" style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem;">Select station role &amp; enter PIN</p>
     </div>
 
-    <!-- Role Selection Tabs -->
-    <div class="role-grid">
-      <div class="role-btn" data-role="owner" onclick="selectRole('owner')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-        <span>Owner</span>
-      </div>
+    <!-- Owner Hidden Mode Banner (only shown when accessing /owner or ?role=owner) -->
+    <div id="owner-mode-banner" class="hidden" style="margin: 1rem 0; padding: 0.65rem 1rem; border-radius: 12px; background: #eff6ff; border: 1.5px solid #bfdbfe; color: #1e40af; font-size: 0.85rem; font-weight: 800; text-align: center;">
+      ★ Owner Executive Portal Login
+    </div>
+
+    <!-- Role Selection Tabs (Staff Only) -->
+    <div class="role-grid" id="staff-role-grid">
       <div class="role-btn active" data-role="manager" onclick="selectRole('manager')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M8 7h8"/><path d="M8 11h8"/><path d="M8 15h5"/></svg>
         <span>Manager</span>
@@ -195,16 +214,6 @@
         Open Customer TV Display (No Login Needed) &rarr;
       </a>
     </div>
-
-    <!-- Default Station PINs -->
-    <div class="quick-pin-hint">
-      <strong>Default Station PINs:</strong><br>
-      • Owner: <code style="font-weight: bold; color: #1d4ed8;">9999</code> (Executive Sales & Daily Reports)<br>
-      • Manager: <code style="font-weight: bold; color: #1d4ed8;">1234</code> (POS, Reports, Settings)<br>
-      • Captain: <code style="font-weight: bold; color: #1d4ed8;">4444</code> (Mobile Order Taking, Tables)<br>
-      • Kitchen: <code style="font-weight: bold; color: #1d4ed8;">2222</code> (KDS Only)<br>
-      • Service: <code style="font-weight: bold; color: #1d4ed8;">3333</code> (Service Area & Dispatch)
-    </div>
   </div>
 
   <script src="/js/icons.js?v=3.0"></script>
@@ -214,6 +223,21 @@
     let selectedCaptainId = null;
     let availableCaptains = [];
     const pinEl = document.getElementById('pin-input');
+
+    // Support direct /login?role=owner (hidden from staff role grid)
+    (function checkInitialRoleFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const r = (params.get('role') || '').toLowerCase();
+      if (r === 'owner') {
+        currentRole = 'owner';
+        document.getElementById('staff-role-grid')?.classList.add('hidden');
+        document.getElementById('owner-mode-banner')?.classList.remove('hidden');
+        const sub = document.getElementById('login-subtitle');
+        if (sub) sub.textContent = 'Enter Owner PIN to access live sales';
+      } else if (['manager', 'captain', 'kitchen', 'service'].includes(r)) {
+        setTimeout(() => selectRole(r), 0);
+      }
+    })();
 
     async function selectRole(role) {
       currentRole = role;

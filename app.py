@@ -369,6 +369,8 @@ def login_required(allowed_roles=None):
             if not user_role:
                 if request.path.startswith('/api/'):
                     return jsonify({'success': False, 'error': 'Authentication required', 'auth_required': True}), 401
+                if request.path == '/owner':
+                    return redirect(url_for('login_page', role='owner'))
                 return redirect(url_for('login_page', next=request.path))
 
             if allowed_roles and user_role not in allowed_roles:
