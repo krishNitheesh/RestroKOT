@@ -97,6 +97,14 @@ def init_db():
         value TEXT NOT NULL
     );
 
+    CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        sent_by TEXT DEFAULT 'Manager',
+        message TEXT NOT NULL,
+        synced_to_cloud INTEGER DEFAULT 0,
+        sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS categories (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,

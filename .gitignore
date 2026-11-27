@@ -10,4 +10,7 @@ data/*.db-shm
 data/*.bak
 data/auto_backups/
 data/cloud_vault/
+data/upi_qr.*
+cloud_storage/
+.env
 .DS_Store

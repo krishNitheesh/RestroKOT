@@ -1895,6 +1895,23 @@ def settle_and_vacate(order_id):
     conn.close()
     full_order = fetch_order_with_items(order_id)
     event_bus.publish('BILL_SETTLED', full_order)
+
+    # Instant non-blocking cloud sync on every paid bill so Owner Portal updates live
+    try:
+        c_cfg = get_cloud_config()
+        if c_cfg.get('cloud_auto_settle', '1') == '1' and c_cfg.get('cloud_provider') == 'webhook_http' and c_cfg.get('cloud_endpoint_url', '').strip():
+            threading.Thread(
+                target=perform_cloud_push,
+                kwargs={
+                    'trigger_type': 'bill_settled',
+                    'pushed_by': session.get('user_name') or 'POS Billing',
+                    'notes': f"Instant sync on Bill #{full_order.get('order_number', order_id)}"
+                },
+                daemon=True
+            ).start()
+    except Exception as e:
+        print(f"[Instant Cloud Sync Warning]: {e}")
+
     return jsonify({'success': True, 'order': full_order})
 
 
@@ -2633,7 +2650,7 @@ def get_cloud_config():
     conn = db.get_db()
     keys = [
         'cloud_provider', 'cloud_vault_path', 'cloud_endpoint_url',
-        'cloud_api_key', 'cloud_auto_settle', 'cloud_auto_hourly',
+        'cloud_api_key', 'cloud_shop_id', 'cloud_auto_settle', 'cloud_auto_hourly',
         'cloud_last_push', 'cloud_last_pull'
     ]
     rows = conn.execute(
@@ -2642,12 +2659,13 @@ def get_cloud_config():
     ).fetchall()
     conn.close()
     config = {r['key']: r['value'] for r in rows}
-    config.setdefault('cloud_provider', 'cloud_vault')
+    config.setdefault('cloud_provider', 'webhook_http')
     config.setdefault('cloud_vault_path', '')
     config.setdefault('cloud_endpoint_url', '')
     config.setdefault('cloud_api_key', '')
+    config.setdefault('cloud_shop_id', '')
     config.setdefault('cloud_auto_settle', '1')
-    config.setdefault('cloud_auto_hourly', '0')
+    config.setdefault('cloud_auto_hourly', '1')
     config.setdefault('cloud_last_push', '')
     config.setdefault('cloud_last_pull', '')
     config['vault_dir'] = get_cloud_vault_dir()
@@ -2697,12 +2715,25 @@ def inspect_db_snapshot(snapshot_path: str):
         conn.close()
 
 
+_cloud_push_lock = threading.Lock()
+
+
 def perform_cloud_push(trigger_type='manual', pushed_by='Manager', notes=''):
     """
     Take an atomic snapshot of restaurant.db, save to cloud vault,
     optionally dispatch to remote cloud endpoint, and record in cloud_backups.
+    Thread-safe via _cloud_push_lock so rapid bill settlements never collide.
     """
+    with _cloud_push_lock:
+        return _perform_cloud_push_locked(trigger_type=trigger_type, pushed_by=pushed_by, notes=notes)
+
+
+def _perform_cloud_push_locked(trigger_type='manual', pushed_by='Manager', notes=''):
     config = get_cloud_config()
+    # Auto-fetch API key if registered and recently approved by Super Admin
+    if config.get('cloud_shop_id') and not config.get('cloud_api_key'):
+        _sync_approval_from_cloud(config['cloud_shop_id'])
+        config = get_cloud_config()
     vault_dir = config['vault_dir']
     now_str = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f"RestroKOT_Backup_{now_str}_{trigger_type}.db"
@@ -2729,6 +2760,7 @@ def perform_cloud_push(trigger_type='manual', pushed_by='Manager', notes=''):
                 data=file_bytes,
                 headers={
                     'Content-Type': 'application/octet-stream',
+                    'User-Agent': 'KniteKOT-POS/2.0',
                     'X-RestroKOT-Filename': filename,
                     'X-RestroKOT-SHA256': sha256_hash,
                     'X-RestroKOT-Trigger': trigger_type,
@@ -2903,6 +2935,120 @@ _hourly_thread = threading.Thread(target=_cloud_hourly_sync_loop, daemon=True)
 _hourly_thread.start()
 
 
+KNITE_CLOUD_BASE = os.environ.get('KNITE_CLOUD_URL', 'https://rms.kniteinfotech.in').strip().rstrip('/')
+
+
+def _sync_approval_from_cloud(shop_id: str) -> dict:
+    """Check Super Admin approval status on KNITE KOT Cloud and auto-save API key if approved."""
+    if not shop_id:
+        return {'registered': False, 'approved': False}
+    try:
+        req = urllib.request.Request(
+            f"{KNITE_CLOUD_BASE}/api/cloud/approval-status/{urllib.parse.quote(shop_id)}",
+            headers={'User-Agent': 'KniteKOT-POS/2.0'},
+            method='GET'
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            data = json.loads(resp.read().decode('utf-8'))
+            if data.get('approved') and data.get('api_key'):
+                conn = db.get_db()
+                with conn:
+                    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_provider', 'webhook_http')")
+                    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_shop_id', ?)", (shop_id,))
+                    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_endpoint_url', ?)", (f"{KNITE_CLOUD_BASE}/api/backups/{shop_id}",))
+                    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_api_key', ?)", (data['api_key'],))
+                    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_auto_settle', '1')")
+                    conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_auto_hourly', '1')")
+                conn.close()
+            return data
+    except Exception as e:
+        return {'registered': True, 'approved': False, 'error': str(e)}
+
+
+@app.route('/api/cloud/register', methods=['POST'])
+@login_required(allowed_roles=['manager'])
+def register_pos_to_cloud():
+    """Register this restaurant directly from POS Manager to KNITE KOT Cloud (pending Super Admin approval)."""
+    data = request.get_json(silent=True) or {}
+    hotel_name = (data.get('hotel_name') or '').strip()
+    shop_id = re.sub(r'[^a-z0-9_-]', '', (data.get('shop_id') or hotel_name).strip().lower().replace(' ', '-'))
+    owner_name = (data.get('owner_name') or '').strip() or 'Owner'
+    owner_phone = (data.get('owner_phone') or '').strip()
+    owner_username = (data.get('owner_username') or '').strip()
+    owner_password = (data.get('owner_password') or '').strip()
+
+    if not hotel_name or not shop_id:
+        return jsonify({'success': False, 'message': 'Restaurant Name and Shop ID are required'}), 400
+    if not owner_username or not owner_password:
+        return jsonify({'success': False, 'message': 'Owner Username and Password are required'}), 400
+
+    payload = json.dumps({
+        'hotel_name': hotel_name,
+        'shop_id': shop_id,
+        'owner_name': owner_name,
+        'owner_phone': owner_phone,
+        'owner_username': owner_username,
+        'owner_password': owner_password
+    }).encode('utf-8')
+
+    try:
+        req = urllib.request.Request(
+            f"{KNITE_CLOUD_BASE}/api/auth/register",
+            data=payload,
+            headers={'Content-Type': 'application/json', 'User-Agent': 'KniteKOT-POS/2.0'},
+            method='POST'
+        )
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            res_data = json.loads(resp.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        try:
+            err_data = json.loads(e.read().decode('utf-8'))
+            return jsonify({'success': False, 'message': err_data.get('message', 'Registration failed')}), e.code
+        except Exception:
+            return jsonify({'success': False, 'message': f'Cloud returned HTTP {e.code}'}), e.code
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Could not reach KNITE KOT Cloud: {e}'}), 502
+
+    # Save pending cloud connection in POS settings
+    conn = db.get_db()
+    with conn:
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('restaurant_name', ?)", (hotel_name,))
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_shop_id', ?)", (shop_id,))
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_provider', 'webhook_http')")
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_endpoint_url', ?)", (f"{KNITE_CLOUD_BASE}/api/backups/{shop_id}",))
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_auto_settle', '1')")
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_auto_hourly', '1')")
+    conn.close()
+
+    return jsonify({
+        'success': True,
+        'shop_id': shop_id,
+        'message': res_data.get('message', 'Registered! Waiting for Super Admin approval.')
+    }), 201
+
+
+@app.route('/api/cloud/check-approval', methods=['GET'])
+@login_required(allowed_roles=['manager'])
+def check_pos_cloud_approval():
+    """Check if Super Admin approved this POS; if newly approved, auto-connect & push first backup."""
+    cfg = get_cloud_config()
+    shop_id = cfg.get('cloud_shop_id', '').strip()
+    if not shop_id:
+        return jsonify({'registered': False, 'approved': False})
+
+    was_connected = bool(cfg.get('cloud_api_key', '').strip())
+    status = _sync_approval_from_cloud(shop_id)
+
+    if status.get('approved') and (not was_connected or not cfg.get('cloud_last_push')):
+        threading.Thread(
+            target=perform_cloud_push,
+            kwargs={'trigger_type': 'auto_connect', 'pushed_by': 'System', 'notes': 'Initial sync on Super Admin approval'},
+            daemon=True
+        ).start()
+
+    return jsonify(status)
+
+
 @app.route('/api/cloud/status', methods=['GET'])
 @login_required(allowed_roles=['manager', 'owner'])
 def get_cloud_status():
@@ -2938,12 +3084,16 @@ def get_cloud_status():
 @app.route('/api/cloud/config', methods=['POST'])
 @login_required(allowed_roles=['manager'])
 def update_cloud_config():
+    cfg = get_cloud_config()
+    if not cfg.get('cloud_api_key', '').strip():
+        return jsonify({
+            'success': False,
+            'message': 'Cloud sync is locked until Super Admin approves your restaurant.'
+        }), 403
+
     data = request.get_json(silent=True) or {}
     conn = db.get_db()
     with conn:
-        for k in ['cloud_provider', 'cloud_vault_path', 'cloud_endpoint_url', 'cloud_api_key']:
-            if k in data:
-                conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)", (k, str(data[k]).strip()))
         if 'cloud_auto_settle' in data:
             val = '1' if data['cloud_auto_settle'] in (True, '1', 1) else '0'
             conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('cloud_auto_settle', ?)", (val,))
@@ -2954,13 +3104,20 @@ def update_cloud_config():
 
     return jsonify({
         'success': True,
-        'message': 'Cloud configuration saved successfully.'
+        'message': 'Cloud sync rules saved.'
     })
 
 
 @app.route('/api/cloud/push', methods=['POST'])
 @login_required(allowed_roles=['manager', 'owner'])
 def api_cloud_push():
+    cfg = get_cloud_config()
+    if not cfg.get('cloud_api_key', '').strip():
+        return jsonify({
+            'success': False,
+            'message': 'Cloud sync is locked until Super Admin approves your restaurant.'
+        }), 403
+
     data = request.get_json(silent=True) or {}
     notes = (data.get('notes') or '').strip()
     trigger_type = (data.get('trigger_type') or 'manual').strip()
@@ -3050,6 +3207,130 @@ def download_cloud_backup(filename):
         return jsonify({'success': False, 'message': 'Backup file not found'}), 404
 
     return send_from_directory(vault_dir, safe_name, as_attachment=True)
+
+
+@app.route('/api/profile/upi-qr', methods=['POST'])
+@login_required(allowed_roles=['manager', 'owner'])
+def upload_pos_upi_qr():
+    if 'qr_file' not in request.files:
+        return jsonify({'success': False, 'message': 'No file uploaded'}), 400
+    f = request.files['qr_file']
+    if not f.filename:
+        return jsonify({'success': False, 'message': 'Empty filename'}), 400
+    ext = os.path.splitext(f.filename)[1].lower()
+    if ext not in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}:
+        return jsonify({'success': False, 'message': 'Only PNG/JPG/GIF/WEBP images allowed'}), 400
+
+    for old_ext in ('.png', '.jpg', '.jpeg', '.gif', '.webp'):
+        old_p = os.path.join(db.DB_DIR, f'upi_qr{old_ext}')
+        if os.path.isfile(old_p):
+            try:
+                os.remove(old_p)
+            except OSError:
+                pass
+
+    dest = os.path.join(db.DB_DIR, f'upi_qr{ext}')
+    f.save(dest)
+
+    conn = db.get_db()
+    with conn:
+        conn.execute("INSERT OR REPLACE INTO settings (key, value) VALUES ('upi_qr_url', '/api/profile/upi-qr')")
+    conn.close()
+    return jsonify({'success': True, 'message': 'UPI QR uploaded successfully', 'url': '/api/profile/upi-qr'})
+
+
+@app.route('/api/profile/upi-qr', methods=['GET'])
+def get_pos_upi_qr():
+    for ext in ('.png', '.jpg', '.jpeg', '.gif', '.webp'):
+        p = os.path.join(db.DB_DIR, f'upi_qr{ext}')
+        if os.path.isfile(p):
+            return send_from_directory(db.DB_DIR, f'upi_qr{ext}')
+    return jsonify({'success': False, 'message': 'No UPI QR uploaded'}), 404
+
+
+@app.route('/api/messages', methods=['GET'])
+@login_required(allowed_roles=['manager', 'owner'])
+def list_pos_messages():
+    conn = db.get_db()
+    try:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sent_by TEXT DEFAULT 'Manager',
+                message TEXT NOT NULL,
+                synced_to_cloud INTEGER DEFAULT 0,
+                sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        rows = conn.execute("SELECT * FROM messages ORDER BY id DESC LIMIT 30").fetchall()
+        return jsonify({'success': True, 'messages': [dict(r) for r in rows]})
+    finally:
+        conn.close()
+
+
+@app.route('/api/messages', methods=['POST'])
+@login_required(allowed_roles=['manager', 'owner'])
+def send_pos_message():
+    data = request.get_json(silent=True) or {}
+    msg_text = (data.get('message') or '').strip()
+    sent_by = (data.get('sent_by') or session.get('user_name') or 'Manager').strip()
+    if not msg_text:
+        return jsonify({'success': False, 'message': 'Message cannot be empty'}), 400
+
+    conn = db.get_db()
+    with conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS messages (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                sent_by TEXT DEFAULT 'Manager',
+                message TEXT NOT NULL,
+                synced_to_cloud INTEGER DEFAULT 0,
+                sent_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        cur = conn.execute(
+            "INSERT INTO messages (sent_by, message, synced_to_cloud) VALUES (?, ?, 0)",
+            (sent_by, msg_text)
+        )
+        msg_id = cur.lastrowid
+    conn.close()
+
+    # Push immediately to configured cloud server if webhook_http is set
+    cloud_synced = False
+    try:
+        config = get_cloud_config()
+        endpoint_url = config.get('cloud_endpoint_url', '').strip()
+        if config.get('cloud_provider') == 'webhook_http' and endpoint_url and '/api/backups/' in endpoint_url:
+            msg_url = endpoint_url.replace('/api/backups/', '/api/messages/')
+            payload = json.dumps({'message': msg_text, 'sent_by': sent_by}).encode('utf-8')
+            req = urllib.request.Request(
+                msg_url,
+                data=payload,
+                headers={
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'KniteKOT-POS/2.0',
+                    'Authorization': f"Bearer {config.get('cloud_api_key', '').strip()}"
+                },
+                method='POST'
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201, 204):
+                    cloud_synced = True
+    except Exception as e:
+        print(f"[POS Message] Cloud push warning (saved locally for next sync): {e}")
+
+    if cloud_synced:
+        conn = db.get_db()
+        with conn:
+            conn.execute("UPDATE messages SET synced_to_cloud = 1 WHERE id = ?", (msg_id,))
+        conn.close()
+
+    return jsonify({
+        'success': True,
+        'id': msg_id,
+        'synced_to_cloud': cloud_synced,
+        'message': 'Message sent to Owner' + (' & synced to Cloud!' if cloud_synced else ' (saved locally; will sync on next backup)')
+    }), 201
 
 
 def get_local_ip():
