@@ -2797,7 +2797,27 @@ def perform_cloud_pull(target_filename=None):
     config = get_cloud_config()
     vault_dir = config['vault_dir']
 
-    # If no filename specified, pick latest
+    # If remote webhook_http is configured and no specific local file requested, download latest from cloud server
+    endpoint_url = config.get('cloud_endpoint_url', '').strip().rstrip('/')
+    if not target_filename and config.get('cloud_provider') == 'webhook_http' and endpoint_url:
+        try:
+            latest_url = f"{endpoint_url}/latest"
+            req = urllib.request.Request(
+                latest_url,
+                headers={'Authorization': f"Bearer {config.get('cloud_api_key', '').strip()}"},
+                method='GET'
+            )
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                remote_name = resp.headers.get('X-RestroKOT-Filename') or f"RestroKOT_Backup_remote_{datetime.now().strftime('%Y%m%d_%H%M%S')}.db"
+                remote_name = os.path.basename(remote_name)
+                remote_dest = os.path.join(vault_dir, remote_name)
+                with open(remote_dest, 'wb') as out_f:
+                    out_f.write(resp.read())
+                target_filename = remote_name
+        except Exception as e:
+            print(f"[Cloud Pull] Remote download fallback to local vault: {e}")
+
+    # If no filename specified, pick latest from local vault/DB
     if not target_filename:
         conn = db.get_db()
         row = conn.execute("SELECT backup_filename FROM cloud_backups ORDER BY id DESC LIMIT 1").fetchone()
