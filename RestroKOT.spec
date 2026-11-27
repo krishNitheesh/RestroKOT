@@ -1,12 +1,10 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller Spec file for RestroKOT Windows Desktop Application (Folder Mode - Fast Launch)
+# PyInstaller Spec file for RestroKOT Windows Desktop Application (Folder Mode)
 
 import os
-from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 
-# Bundle only static frontend assets (data/ is stored permanently in %LOCALAPPDATA%\RestroKOT\data)
 datas = [
     ('public', 'public'),
 ]
@@ -19,10 +17,7 @@ hiddenimports = [
     'werkzeug',
     'werkzeug.serving',
     'sqlite3',
-    'webview',
-    'clr',
-    'pythonnet',
-] + collect_submodules('webview')
+]
 
 a = Analysis(
     ['desktop_app.py'],
@@ -52,7 +47,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=False,  # Hide black command prompt window
+    console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,

@@ -1,13 +1,15 @@
 """
-RestroKOT Desktop App Runner for Windows (.exe) & Mac
-Launches background Flask + SSE + Intercom WebSocket server and opens a native desktop window.
-Guaranteed 0% data loss: persistent AppData storage, SQLite WAL + FULL sync, and clean WAL checkpoint on exit.
+RestroKOT Desktop & LAN Server Runner for Windows (.exe) & Mac
+Starts the Flask + SSE + Intercom WebSocket server (0% data-loss SQLite WAL)
+and opens the POS in a clean borderless App Window (Microsoft Edge / Chrome App Mode).
 """
 import os
 import sys
 import time
+import signal
 import threading
 import socket
+import subprocess
 import webbrowser
 import logging
 
@@ -15,11 +17,9 @@ import db
 
 
 def setup_logging():
-    """Log desktop runner output to persistent data directory (and fix None stdout/stderr in Windows console=False .exe)."""
+    """Log desktop runner output to persistent data directory."""
     os.makedirs(db.DB_DIR, exist_ok=True)
     log_path = os.path.join(db.DB_DIR, 'restrokot_desktop.log')
-
-    # Crucial for PyInstaller console=False on Windows where sys.stdout / sys.stderr are None
     if sys.stdout is None:
         sys.stdout = open(log_path, 'a', encoding='utf-8', buffering=1)
     if sys.stderr is None:
@@ -33,16 +33,6 @@ def setup_logging():
             logging.StreamHandler(sys.stdout)
         ]
     )
-
-
-def show_windows_error(title: str, message: str):
-    """Show a visible Windows alert dialog if startup fails in console=False mode."""
-    if sys.platform == 'win32':
-        try:
-            import ctypes
-            ctypes.windll.user32.MessageBoxW(0, message, title, 0x10)
-        except Exception:
-            pass
 
 
 def is_port_in_use(port: int) -> bool:
@@ -86,71 +76,78 @@ def wait_for_server(port: int, timeout: float = 15.0) -> bool:
     return False
 
 
+def open_app_window(url: str):
+    """Open RestroKOT in a clean borderless App Window (Edge/Chrome App Mode) or default browser."""
+    if sys.platform == 'win32':
+        # Try common Windows Edge and Chrome paths for borderless --app mode
+        candidates = [
+            r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+            r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+            r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+        ]
+        for exe in candidates:
+            if os.path.isfile(exe):
+                try:
+                    subprocess.Popen([exe, f"--app={url}"])
+                    return
+                except Exception:
+                    pass
+        # Fallback to shell start msedge or default browser
+        rc = os.system(f'start "" msedge --app="{url}"')
+        if rc != 0:
+            webbrowser.open(url)
+    else:
+        webbrowser.open(url)
+
+
 def main():
     setup_logging()
     port = int(os.environ.get('PORT', 3000))
 
-    logging.info("=" * 60)
-    logging.info("RestroKOT Desktop App Starting")
-    logging.info(f"Persistent Database: {db.DB_PATH}")
-    logging.info("=" * 60)
-
     owns_server = False
     if not is_port_in_use(port):
         owns_server = True
-        logging.info(f"Starting RestroKOT server on port {port}...")
         t = threading.Thread(target=start_server, daemon=True)
         t.start()
         if not wait_for_server(port, timeout=15.0):
-            logging.error("Timed out waiting for RestroKOT server to bind port 3000.")
-            show_windows_error(
-                "RestroKOT Startup Error",
-                f"Could not start RestroKOT server on port {port}.\n\nCheck log file:\n{os.path.join(db.DB_DIR, 'restrokot_desktop.log')}"
-            )
-    else:
-        logging.info(f"RestroKOT server is already active on port {port} (reusing existing instance).")
+            print(f"[ERROR] Timed out waiting for RestroKOT server on port {port}.")
+            input("Press Enter to exit...")
+            sys.exit(1)
 
     local_ip = get_local_ip()
-    target_url = f"http://127.0.0.1:{port}/pos"
-    logging.info(f"Cashier POS:    {target_url}")
-    logging.info(f"Captain Mobile: http://{local_ip}:{port}/captain")
-    logging.info(f"Kitchen KDS:    http://{local_ip}:{port}/kitchen")
+    local_url = f"http://127.0.0.1:{port}/login"
+    lan_url = f"http://{local_ip}:{port}/login"
 
-    # Launch native desktop window with pywebview (Edge WebView2 on Windows)
-    try:
-        import webview
-        logging.info("Launching native desktop window (pywebview)...")
-        webview.create_window(
-            title="RestroKOT - Restaurant POS & KDS Suite",
-            url=target_url,
-            width=1366,
-            height=860,
-            min_size=(1024, 650),
-            confirm_close=True
-        )
-        webview.start()
-        logging.info("RestroKOT window closed by user.")
-    except Exception as e:
-        logging.warning(f"pywebview unavailable or failed ({e}). Falling back to Edge App Mode / browser...")
-        if sys.platform == 'win32':
-            rc = os.system(f'start "" msedge --app="{target_url}"')
-            if rc != 0:
-                webbrowser.open(target_url)
-        else:
-            webbrowser.open(target_url)
+    print("=" * 64)
+    print("  RestroKOT - Restaurant POS & KDS Server (RUNNING)")
+    print("=" * 64)
+    print(f"  This PC App:       {local_url}")
+    print(f"  Wi-Fi / LAN Link:  {lan_url}")
+    print(f"  Database (Safe):   {db.DB_PATH}")
+    print("-" * 64)
+    print("  Keep this window open while the restaurant is operating.")
+    print("  Other PCs, Tablets, Phones & TVs on Wi-Fi can open:")
+    print(f"  -> {lan_url}")
+    print("=" * 64)
 
+    open_app_window(local_url)
+
+    def shutdown_handler(signum=None, frame=None):
         if owns_server:
-            try:
-                while True:
-                    time.sleep(1)
-            except KeyboardInterrupt:
-                logging.info("Shutting down.")
-    finally:
-        if owns_server:
-            logging.info("Checkpointing SQLite WAL to disk before exit (0% data loss)...")
+            print("\nSaving & checkpointing database (0% data loss)...")
             db.checkpoint_db()
-            logging.info("Checkpoint complete. Exiting cleanly.")
         sys.exit(0)
+
+    signal.signal(signal.SIGINT, shutdown_handler)
+    signal.signal(signal.SIGTERM, shutdown_handler)
+
+    if owns_server:
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            shutdown_handler()
 
 
 if __name__ == '__main__':
