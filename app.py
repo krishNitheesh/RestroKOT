@@ -2316,6 +2316,52 @@ def get_daily_settlement():
         (target_date,)
     ).fetchone()
 
+    # Total items sold in paid orders
+    items_row = conn.execute(
+        """SELECT COALESCE(SUM(oi.quantity), 0) AS total_items
+           FROM order_items oi
+           JOIN orders o ON o.id = oi.order_id
+           WHERE date(o.created_at) = ? AND o.payment_status = 'paid'""",
+        (target_date,)
+    ).fetchone()
+    total_items = int(items_row['total_items']) if items_row else 0
+
+    # Order Type Wise Summary (Dine In, Take Out, Delivery)
+    order_type_summary = {}
+    for ch_key, ch_filter in [('dine_in', "('dine_in')"), ('takeaway', "('takeaway')"), ('delivery', "('swiggy', 'zomato')")]:
+        ch_row = conn.execute(
+            f"""SELECT
+                COUNT(CASE WHEN payment_status = 'paid' THEN 1 END) AS total_bills,
+                COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN grand_total ELSE 0 END), 0) AS sales_amount,
+                COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN (cgst_amount + sgst_amount) ELSE 0 END), 0) AS tax_amount,
+                COUNT(CASE WHEN status = 'cancelled' THEN 1 END) AS cancel_bills,
+                COALESCE(SUM(CASE WHEN status = 'cancelled' THEN grand_total ELSE 0 END), 0) AS cancel_amount
+               FROM orders
+               WHERE date(created_at) = ? AND channel IN {ch_filter}""",
+            (target_date,)
+        ).fetchone()
+        kot_row = conn.execute(
+            f"""SELECT
+                COUNT(*) AS total_kots,
+                COUNT(CASE WHEN k.status = 'cancelled' THEN 1 END) AS cancel_kots
+               FROM kot_tickets k
+               JOIN orders o ON o.id = k.order_id
+               WHERE date(o.created_at) = ? AND o.channel IN {ch_filter}""",
+            (target_date,)
+        ).fetchone()
+        t_bills = int(ch_row['total_bills'] or 0)
+        t_sales = float(ch_row['sales_amount'] or 0)
+        order_type_summary[ch_key] = {
+            'total_kots': int(kot_row['total_kots'] or 0),
+            'cancel_kots': int(kot_row['cancel_kots'] or 0),
+            'total_bills': t_bills,
+            'sales_amount': t_sales,
+            'avg_per_bill': round(t_sales / t_bills, 2) if t_bills > 0 else 0.0,
+            'tax_amount': float(ch_row['tax_amount'] or 0),
+            'cancel_bills': int(ch_row['cancel_bills'] or 0),
+            'cancel_amount': float(ch_row['cancel_amount'] or 0)
+        }
+
     # Check for any active open / unpaid tables
     unpaid_orders = conn.execute(
         """SELECT id, order_number, token_number, channel, table_name, grand_total, status, created_at
@@ -2364,6 +2410,8 @@ def get_daily_settlement():
         'is_settled': bool(existing),
         'settlement': dict(existing) if existing else None,
         'live_summary': dict(summary) if summary else {},
+        'total_items': total_items,
+        'order_type_summary': order_type_summary,
         'unpaid_orders': [dict(o) for o in unpaid_orders],
         'handover_count': len(handovers_list),
         'cash_reconciliation': cash_reconciliation

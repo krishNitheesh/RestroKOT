@@ -1783,144 +1783,166 @@ function printSettlementZReport(settlementData) {
   const actionLabel = document.getElementById('print-action-label');
   if (!container) return;
 
-  if (titleEl) titleEl.textContent = 'Daily Settlement Z-Report';
-  if (actionLabel) actionLabel.textContent = 'Print Z-Report (80mm)';
+  if (titleEl) titleEl.textContent = 'Cash Hand Over Statement (Daily Bill)';
+  if (actionLabel) actionLabel.textContent = 'Print Daily Statement (80mm)';
 
-  const s = settlementData || (currentSettlementData?.is_settled ? currentSettlementData.settlement : currentSettlementData?.live_summary) || currentSalesSummary || {};
+  const liveSum = currentSettlementData?.live_summary || currentSalesSummary || {};
+  const cashRec = currentSettlementData?.cash_reconciliation || {};
+  const s = settlementData || (currentSettlementData?.is_settled ? currentSettlementData.settlement : liveSum) || {};
+
   const dateStr = (settlementData?.settlement_date) || currentReportDate || getLocalDateStr();
   const restName = settings.restaurant_name || 'RESTRO KOT';
   const restGstin = settings.gstin || '';
   const now = new Date();
   const printTimeStr = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
+  const totalBills = Number(s.paid_orders ?? liveSum.paid_orders ?? s.paid_bills ?? 0);
+  const totalItems = Number(currentSettlementData?.total_items ?? 0);
+  const totalSales = Number(s.net_sales ?? liveSum.net_sales ?? s.total_sales ?? 0);
+  const taxAmount = Number(s.tax_amount ?? liveSum.tax_amount ?? 0);
+
+  const cashSales = Number(s.cash_sales ?? liveSum.cash_sales ?? 0);
+  const upiSales = Number(s.upi_sales ?? liveSum.upi_sales ?? 0);
+  const cardSales = Number(s.card_sales ?? liveSum.card_sales ?? 0);
+
+  const morningCash = Number(s.opening_float ?? cashRec.opening_float ?? 0);
+  const cashTaken = Number(s.petty_expenses ?? cashRec.petty_expenses ?? 0);
+  const sysCash = morningCash + cashSales - cashTaken;
+  const cashInHand = Number(s.actual_cash ?? cashRec.actual_cash ?? 0);
+  const variance = cashInHand - sysCash;
+
+  // Parse denominations JSON if present
+  let denoms = {};
+  try {
+    const rawDenom = s.denominations_json || cashRec.denominations_json || '{}';
+    denoms = typeof rawDenom === 'string' ? JSON.parse(rawDenom) : (rawDenom || {});
+  } catch (e) { denoms = {}; }
+
+  const denomRows = [
+    { label: '500.00', val: 500, cnt: Number(denoms['500'] || 0) },
+    { label: '200.00', val: 200, cnt: Number(denoms['200'] || 0) },
+    { label: '100.00', val: 100, cnt: Number(denoms['100'] || 0) },
+    { label: '50.00', val: 50, cnt: Number(denoms['50'] || 0) },
+    { label: '20.00', val: 20, cnt: Number(denoms['20'] || 0) },
+    { label: '10.00', val: 10, cnt: Number(denoms['10'] || 0) },
+  ];
+  const coinsAmt = Number(denoms['coins'] || 0);
+  const totalDenom = denomRows.reduce((acc, r) => acc + (r.val * r.cnt), 0) + coinsAmt;
+
+  const ot = currentSettlementData?.order_type_summary || {};
+  const dine = ot.dine_in || {};
+  const take = ot.takeaway || {};
+  const deliv = ot.delivery || {};
+
   container.innerHTML = `
-    <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 6px; margin-bottom: 8px;">
-      <h2 style="font-size: 15px; margin: 0; font-weight: bold; text-transform: uppercase;">${restName}</h2>
-      <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">DAILY SETTLEMENT REPORT</div>
-      <div style="font-size: 10px; font-weight: bold;">(EOD Z-REPORT)</div>
-      ${restGstin ? `<div style="font-size: 9px; margin-top: 2px;">GSTIN: ${restGstin}</div>` : ''}
+    <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 6px; margin-bottom: 6px;">
+      <h2 style="font-size: 14px; margin: 0; font-weight: bold; text-transform: uppercase;">${restName}</h2>
+      <div style="font-size: 11px; font-weight: bold; margin-top: 2px;">Cash Hand Over Statement</div>
+      ${restGstin ? `<div style="font-size: 9px; margin-top: 1px;">GSTIN: ${restGstin}</div>` : ''}
     </div>
 
-    <div style="font-size: 10px; line-height: 1.5; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-      <div><strong>Report Date:</strong> ${dateStr}</div>
-      <div><strong>Print Time:</strong> ${printTimeStr}</div>
-      <div><strong>Settled By:</strong> ${s.settled_by || 'Manager'}</div>
-      <div><strong>Status:</strong> ${s.status === 'settled' ? 'CLOSED / SETTLED' : 'ACTIVE / LIVE'}</div>
+    <div style="font-size: 10px; line-height: 1.45; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+      <div>Date    : <strong>${dateStr}</strong></div>
+      <div>Time    : <strong>${printTimeStr}</strong></div>
+      <div>Counter : <strong>MAIN COUNTER</strong></div>
+      <div>User    : <strong>${s.settled_by || 'Manager'}</strong></div>
     </div>
 
-    <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">ORDER SUMMARY</div>
-    <table style="width: 100%; font-size: 10px; line-height: 1.5; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-      <tr>
-        <td>Total Orders:</td>
-        <td style="text-align: right; font-weight: bold;">${s.total_orders || s.total_bills || 0}</td>
-      </tr>
-      <tr>
-        <td>Paid Bills:</td>
-        <td style="text-align: right; font-weight: bold;">${s.paid_orders || s.paid_bills || 0}</td>
-      </tr>
-      <tr>
-        <td>Cancelled Orders:</td>
-        <td style="text-align: right;">${s.cancelled_orders || s.cancelled_bills || 0}</td>
-      </tr>
-      <tr>
-        <td>Unpaid / Open:</td>
-        <td style="text-align: right;">${s.unpaid_orders || 0}</td>
+    <table style="width: 100%; font-size: 10px; line-height: 1.45; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+      <tr><td>No of Bills :</td><td style="text-align: right; font-weight: bold;">${totalBills}</td></tr>
+      <tr><td>No of Items :</td><td style="text-align: right; font-weight: bold;">${totalItems}</td></tr>
+      <tr><td>Total Sales :</td><td style="text-align: right; font-weight: bold;">${totalSales.toFixed(2)}</td></tr>
+      <tr><td>Tax Amount  :</td><td style="text-align: right;">${taxAmount.toFixed(2)}</td></tr>
+    </table>
+
+    <div style="font-size: 10px; font-weight: bold; margin-bottom: 3px;">Sales Mode</div>
+    <table style="width: 100%; font-size: 10px; line-height: 1.45; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+      <tr><td>Cash        :</td><td style="text-align: right;">${cashSales.toFixed(2)}</td></tr>
+      <tr><td>UPI/PhonePe :</td><td style="text-align: right;">${upiSales.toFixed(2)}</td></tr>
+      <tr><td>Card        :</td><td style="text-align: right;">${cardSales.toFixed(2)}</td></tr>
+      <tr style="border-top: 1px dashed #000; font-weight: bold;">
+        <td style="padding-top: 3px;">Total Sales :</td>
+        <td style="text-align: right; padding-top: 3px;">${totalSales.toFixed(2)}</td>
       </tr>
     </table>
 
-    <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">SALES & TAX BREAKDOWN</div>
-    <table style="width: 100%; font-size: 10px; line-height: 1.6; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-      <tr>
-        <td>Gross Sales:</td>
-        <td style="text-align: right;">Rs. ${Number(s.gross_sales || s.subtotal || 0).toFixed(2)}</td>
+    <div style="font-size: 10px; font-weight: bold; margin-bottom: 3px;">Denomination</div>
+    <table style="width: 100%; font-size: 10px; line-height: 1.4; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+      <tr style="border-bottom: 1px dashed #000; font-weight: bold;">
+        <td>Rs.</td><td style="text-align: center;">* Nos</td><td style="text-align: right;">Amount</td>
       </tr>
+      ${denomRows.map(r => `
+        <tr>
+          <td>${r.label}</td>
+          <td style="text-align: center;">* ${r.cnt} =</td>
+          <td style="text-align: right;">${(r.val * r.cnt).toFixed(2)}</td>
+        </tr>
+      `).join('')}
       <tr>
-        <td>(-) Total Discount:</td>
-        <td style="text-align: right;">Rs. ${Number(s.discount_amount || 0).toFixed(2)}</td>
+        <td>Coins</td>
+        <td style="text-align: center;">=</td>
+        <td style="text-align: right;">${coinsAmt.toFixed(2)}</td>
       </tr>
-      <tr>
-        <td>(+) GST Taxes:</td>
-        <td style="text-align: right;">Rs. ${Number(s.tax_amount || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>Round-off:</td>
-        <td style="text-align: right;">Rs. ${Number(s.round_off || 0).toFixed(2)}</td>
-      </tr>
-      <tr style="border-top: 1px dashed #000; font-size: 11px; font-weight: bold;">
-        <td style="padding: 4px 0;">NET SALES REVENUE:</td>
-        <td style="text-align: right; padding: 4px 0;">Rs. ${Number(s.net_sales || s.total_sales || 0).toFixed(2)}</td>
+      <tr style="border-top: 1px dashed #000; font-weight: bold;">
+        <td colspan="2" style="padding-top: 3px;">Total Denom :</td>
+        <td style="text-align: right; padding-top: 3px;">${totalDenom.toFixed(2)}</td>
       </tr>
     </table>
 
-    <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">COLLECTIONS BY PAYMENT MODE</div>
-    <table style="width: 100%; font-size: 10px; line-height: 1.6; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-      <tr>
-        <td>💵 Cash Sales:</td>
-        <td style="text-align: right; font-weight: bold;">Rs. ${Number(s.cash_sales || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>📱 UPI / QR:</td>
-        <td style="text-align: right; font-weight: bold;">Rs. ${Number(s.upi_sales || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>💳 Card / POS:</td>
-        <td style="text-align: right; font-weight: bold;">Rs. ${Number(s.card_sales || 0).toFixed(2)}</td>
-      </tr>
-    </table>
-
-    <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">DAILY CASH DRAWER RECONCILIATION</div>
-    <table style="width: 100%; font-size: 10px; line-height: 1.5; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-      <tr>
-        <td>Opening Cash Float:</td>
-        <td style="text-align: right;">Rs. ${Number(s.opening_float || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>(+) Cash Sales Collected:</td>
-        <td style="text-align: right;">Rs. ${Number(s.cash_sales || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>(-) Petty Expenses:</td>
-        <td style="text-align: right;">Rs. ${Number(s.petty_expenses || 0).toFixed(2)}</td>
-      </tr>
+    <table style="width: 100%; font-size: 10px; line-height: 1.45; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 5px;">
+      <tr><td>Morning Cash (Owner) :</td><td style="text-align: right;">${morningCash.toFixed(2)}</td></tr>
+      <tr><td>Cash Sales           :</td><td style="text-align: right;">${cashSales.toFixed(2)}</td></tr>
+      <tr><td>Cash Taken / Exp (-) :</td><td style="text-align: right;">${cashTaken.toFixed(2)}</td></tr>
       <tr style="border-top: 1px dashed #000;">
-        <td>Expected Cash in Drawer:</td>
-        <td style="text-align: right; font-weight: bold;">Rs. ${(Number(s.opening_float || 0) + Number(s.cash_sales || 0) - Number(s.petty_expenses || 0)).toFixed(2)}</td>
+        <td>As per sys. cash     :</td><td style="text-align: right; font-weight: bold;">${sysCash.toFixed(2)}</td>
       </tr>
       <tr>
-        <td>Actual Cash Counted:</td>
-        <td style="text-align: right; font-weight: bold;">Rs. ${Number(s.actual_cash || 0).toFixed(2)}</td>
+        <td>Cash in Hand         :</td><td style="text-align: right; font-weight: bold;">${cashInHand.toFixed(2)}</td>
       </tr>
-      <tr style="font-weight: bold;">
-        <td>Cash Variance:</td>
-        <td style="text-align: right;">Rs. ${Number(s.cash_variance || 0).toFixed(2)} (${Number(s.cash_variance || 0) === 0 ? 'Balanced' : (Number(s.cash_variance || 0) > 0 ? 'Surplus' : 'Shortage')})</td>
+      <tr style="border-top: 1px dashed #000; font-weight: bold;">
+        <td style="padding-top: 3px;">${variance >= 0 ? 'Excess' : 'Short'} :</td>
+        <td style="text-align: right; padding-top: 3px;">${Math.abs(variance).toFixed(2)}</td>
       </tr>
     </table>
 
-    <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px;">CHANNEL BREAKDOWN</div>
-    <table style="width: 100%; font-size: 10px; line-height: 1.5; border-collapse: collapse; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-      <tr>
-        <td>Dine-In:</td>
-        <td style="text-align: right;">Rs. ${Number(s.dine_in_sales || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>Takeaway:</td>
-        <td style="text-align: right;">Rs. ${Number(s.takeaway_sales || 0).toFixed(2)}</td>
-      </tr>
-      <tr>
-        <td>Online Delivery:</td>
-        <td style="text-align: right;">Rs. ${Number(s.delivery_sales || 0).toFixed(2)}</td>
-      </tr>
+    <div style="font-size: 10px; font-weight: bold; margin-bottom: 4px; border-bottom: 1px dashed #000; padding-bottom: 2px;">ORDER TYPE WISE SUMMARY</div>
+    <div style="font-size: 10px; font-weight: bold; margin-bottom: 2px;">Dine In</div>
+    <table style="width: 100%; font-size: 10px; line-height: 1.4; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 4px;">
+      <tr><td>TOTAL KOTs        :</td><td style="text-align: right;">${Number(dine.total_kots || 0)}</td></tr>
+      <tr><td>TOTAL BILLS       :</td><td style="text-align: right;">${Number(dine.total_bills || 0)}</td></tr>
+      <tr><td>TOT SALES AMOUNT  :</td><td style="text-align: right; font-weight: bold;">${Number(dine.sales_amount || 0).toFixed(2)}</td></tr>
+      <tr><td>AVG PER BILL AMT  :</td><td style="text-align: right;">${Number(dine.avg_per_bill || 0).toFixed(2)}</td></tr>
+      <tr><td>TOTAL CANCEL KOTs :</td><td style="text-align: right;">${Number(dine.cancel_kots || 0)}</td></tr>
+      <tr><td>CANCEL AMOUNT     :</td><td style="text-align: right;">${Number(dine.cancel_amount || 0).toFixed(2)}</td></tr>
+      <tr><td>TAX AMOUNT        :</td><td style="text-align: right;">${Number(dine.tax_amount || 0).toFixed(2)}</td></tr>
     </table>
+
+    <div style="font-size: 10px; font-weight: bold; margin-bottom: 2px;">Take Out</div>
+    <table style="width: 100%; font-size: 10px; line-height: 1.4; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 4px;">
+      <tr><td>NO. OF BILLS      :</td><td style="text-align: right;">${Number(take.total_bills || 0)}</td></tr>
+      <tr><td>TOTAL BILLS AMT   :</td><td style="text-align: right; font-weight: bold;">${Number(take.sales_amount || 0).toFixed(2)}</td></tr>
+      <tr><td>AVG PER BILL AMT  :</td><td style="text-align: right;">${Number(take.avg_per_bill || 0).toFixed(2)}</td></tr>
+      <tr><td>TAX AMOUNT        :</td><td style="text-align: right;">${Number(take.tax_amount || 0).toFixed(2)}</td></tr>
+    </table>
+
+    ${Number(deliv.total_bills || 0) > 0 ? `
+      <div style="font-size: 10px; font-weight: bold; margin-bottom: 2px;">Online Delivery</div>
+      <table style="width: 100%; font-size: 10px; line-height: 1.4; border-collapse: collapse; margin-bottom: 6px; border-bottom: 1px dashed #000; padding-bottom: 4px;">
+        <tr><td>NO. OF BILLS      :</td><td style="text-align: right;">${Number(deliv.total_bills || 0)}</td></tr>
+        <tr><td>TOTAL BILLS AMT   :</td><td style="text-align: right; font-weight: bold;">${Number(deliv.sales_amount || 0).toFixed(2)}</td></tr>
+        <tr><td>TAX AMOUNT        :</td><td style="text-align: right;">${Number(deliv.tax_amount || 0).toFixed(2)}</td></tr>
+      </table>
+    ` : ''}
 
     ${s.notes ? `
-      <div style="font-size: 9px; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 6px;">
-        <strong>Closing Notes:</strong> ${s.notes}
+      <div style="font-size: 9px; margin-bottom: 8px; border-bottom: 1px dashed #000; padding-bottom: 4px;">
+        <strong>Notes:</strong> ${s.notes}
       </div>
     ` : ''}
 
-    <div style="font-size: 10px; margin-top: 14px; text-align: right;">
-      <div>_________________</div>
-      <div style="font-size: 8px; font-weight: bold; margin-top: 2px;">Manager Signature</div>
+    <div style="display: flex; justify-content: space-between; font-size: 9px; font-weight: bold; margin-top: 18px; padding-top: 4px;">
+      <span>Cash Hand Over by</span>
+      <span>Authorised Sig</span>
     </div>
   `;
 
