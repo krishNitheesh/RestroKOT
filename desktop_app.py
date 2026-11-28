@@ -89,12 +89,12 @@ def open_app_window(url: str):
         for exe in candidates:
             if os.path.isfile(exe):
                 try:
-                    subprocess.Popen([exe, f"--app={url}"])
+                    subprocess.Popen([exe, "--kiosk-printing", f"--app={url}"])
                     return
                 except Exception:
                     pass
         # Fallback to shell start msedge or default browser
-        rc = os.system(f'start "" msedge --app="{url}"')
+        rc = os.system(f'start "" msedge --kiosk-printing --app="{url}"')
         if rc != 0:
             webbrowser.open(url)
     else:

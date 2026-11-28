@@ -1468,7 +1468,7 @@ function printReceiptCopies(copies = 2) {
         container.innerHTML = singleHtml;
       };
       window.addEventListener('afterprint', handleSecondAfterPrint);
-      setTimeout(() => window.print(), 150);
+      setTimeout(() => window.print(), 350);
     };
 
     window.addEventListener('afterprint', handleFirstAfterPrint);
