@@ -1420,6 +1420,38 @@ function openPrintModal() {
   document.getElementById('print-modal').classList.remove('hidden');
 }
 
+function printReceiptCopies(copies = 2) {
+  const container = document.getElementById('thermal-receipt-area');
+  if (!container) return;
+  const singleHtml = container.dataset.singleCopyHtml || container.innerHTML;
+  container.dataset.singleCopyHtml = singleHtml;
+
+  if (copies === 2) {
+    container.innerHTML = `
+      <div class="print-copy-break">
+        <div style="text-align:center; font-size:9px; font-weight:bold; letter-spacing:1px; margin-bottom:4px;">*** CUSTOMER COPY ***</div>
+        ${singleHtml}
+      </div>
+      <div>
+        <div style="text-align:center; font-size:9px; font-weight:bold; letter-spacing:1px; margin-bottom:4px;">*** COUNTER COPY ***</div>
+        ${singleHtml}
+      </div>
+    `;
+  } else {
+    container.innerHTML = singleHtml;
+  }
+
+  window.print();
+
+  // Restore clean single preview after print dialog closes
+  setTimeout(() => {
+    if (container.dataset.singleCopyHtml) {
+      container.innerHTML = container.dataset.singleCopyHtml;
+    }
+  }, 500);
+}
+window.printReceiptCopies = printReceiptCopies;
+
 function closePrintModal() {
   document.getElementById('print-modal').classList.add('hidden');
 }

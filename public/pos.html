@@ -517,11 +517,14 @@
       <div class="modal-body" style="background: white; color: black; font-family: monospace; padding: 1.5rem; border-radius: 8px;" id="thermal-receipt-area">
         <!-- Rendered dynamically -->
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="gap: 0.5rem; flex-wrap: wrap;">
         <button class="btn btn-secondary" onclick="closePrintModal()">Close</button>
-        <button class="btn btn-primary" onclick="window.print()">
+        <button class="btn btn-secondary" onclick="printReceiptCopies(1)">
+          Print 1 Bill
+        </button>
+        <button class="btn btn-primary" onclick="printReceiptCopies(2)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-          Print Receipt (80mm)
+          Print 2 Bills (Customer + Counter)
         </button>
       </div>
     </div>

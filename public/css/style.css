@@ -847,29 +847,57 @@ body {
   border-color: #fca5a5;
 }
 
-/* Print (80mm POS Thermal Receipt) */
+/* Print (80mm POS Thermal Receipt - Zero Extra Blank Pages) */
 @media print {
-  body * {
-    visibility: hidden;
+  @page {
+    margin: 0;
+    size: 80mm auto;
   }
-  #thermal-receipt-area, #thermal-receipt-area * {
-    visibility: visible;
+  html, body {
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+  }
+  .restro-container,
+  .mobile-nav-backdrop,
+  .modal-overlay:not(#print-modal),
+  #print-modal .modal-header,
+  #print-modal .modal-footer,
+  .no-print {
+    display: none !important;
+  }
+  #print-modal {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #print-modal .modal-box {
+    box-shadow: none !important;
+    border: none !important;
+    max-width: 100% !important;
+    width: 78mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
   #thermal-receipt-area {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 78mm;
-    margin: 0;
-    padding: 2mm;
+    position: static !important;
+    width: 78mm !important;
+    margin: 0 !important;
+    padding: 2mm !important;
     color: #000 !important;
     background: #fff !important;
     font-family: 'Courier New', Courier, monospace !important;
     font-size: 11px !important;
     line-height: 1.25 !important;
   }
-  .no-print {
-    display: none !important;
+  .print-copy-break {
+    page-break-after: always;
+    break-after: page;
   }
 }
 

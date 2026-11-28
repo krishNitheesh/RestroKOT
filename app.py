@@ -1790,7 +1790,8 @@ def get_service_tickets():
            FROM kot_tickets kt
            JOIN orders o ON kt.order_id = o.id
            WHERE kt.status IN ('preparing', 'ready')
-           ORDER BY CASE kt.status WHEN 'ready' THEN 1 ELSE 2 END, kt.id ASC"""
+              OR (kt.status = 'served' AND date(kt.served_at) = date('now', 'localtime'))
+           ORDER BY CASE kt.status WHEN 'ready' THEN 1 WHEN 'preparing' THEN 2 ELSE 3 END, kt.id DESC"""
     ).fetchall()
 
     ticket_ids = [t['id'] for t in tickets]

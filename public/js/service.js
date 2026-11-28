@@ -53,8 +53,15 @@ async function loadServiceTickets() {
 function renderColumns() {
   let readyTickets = activeTickets.filter(t => t.status === 'ready');
   let prepTickets = activeTickets.filter(t => t.status === 'preparing');
+  let outTickets = activeTickets.filter(t => t.status === 'served');
 
-  if (activeFilter !== 'all') {
+  const countOutEl = document.getElementById('count-out');
+  if (countOutEl) countOutEl.textContent = outTickets.length;
+
+  if (activeFilter === 'out_only') {
+    readyTickets = outTickets;
+    prepTickets = [];
+  } else if (activeFilter !== 'all') {
     readyTickets = readyTickets.filter(t => t.channel === activeFilter);
     prepTickets = prepTickets.filter(t => t.channel === activeFilter);
   }
@@ -138,9 +145,9 @@ function renderColumns() {
           ${itemsSummary}
         </div>
 
-        <button class="btn btn-success btn-lg" style="width: 100%; font-weight: 800; font-size: 0.95rem; margin-top: 0.45rem; border-radius: 10px;" onclick="serveTicket(${ticket.id})">
+        <button class="btn btn-success btn-lg" style="width: 100%; font-weight: 800; font-size: 0.95rem; margin-top: 0.45rem; border-radius: 10px;" onclick="serveTicket(${ticket.id})" ${ticket.status === 'served' ? 'disabled style="width:100%;opacity:0.65;background:#475569;border:none;border-radius:10px;margin-top:0.45rem;"' : ''}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          MARK SERVED / DISPATCHED
+          ${ticket.status === 'served' ? 'ALREADY OUT ✓' : 'OUT (MARK SERVED)'}
         </button>
       `;
 
@@ -191,6 +198,10 @@ function renderColumns() {
         <div style="font-size: 0.86rem; color: #334155; line-height: 1.4; margin-top: 0.45rem; background: #f8fafc; padding: 0.5rem 0.75rem; border-radius: 8px;">
           ${itemsSummary}
         </div>
+
+        <button class="btn btn-sm" style="width: 100%; margin-top: 0.55rem; background: #16a34a; color: #fff; font-weight: 800; border: none; border-radius: 8px; padding: 0.45rem 0.75rem; cursor: pointer;" onclick="serveTicket(${ticket.id})">
+          OUT (MARK SERVED) →
+        </button>
       `;
 
       prepContainer.appendChild(card);
