@@ -933,11 +933,11 @@ function renderThermalBill(order) {
       const lineTotal = (it.price * it.quantity).toFixed(2);
       const roundTag = it.round_number && it.round_number > 1 ? ` (R${it.round_number})` : '';
       return `
-        <tr>
-          <td style="padding: 2px 0; text-align: left;">${it.item_name}${roundTag}</td>
-          <td style="padding: 2px 0; text-align: center;">${it.quantity}</td>
-          <td style="padding: 2px 0; text-align: right;">${it.price.toFixed(2)}</td>
-          <td style="padding: 2px 0; text-align: right;">${lineTotal}</td>
+        <tr style="font-size: 11px;">
+          <td style="padding: 3px 0; text-align: left; font-weight: 800;">${it.item_name}${roundTag}</td>
+          <td style="padding: 3px 0; text-align: center; font-weight: 800;">${it.quantity}</td>
+          <td style="padding: 3px 0; text-align: right;">${it.price.toFixed(2)}</td>
+          <td style="padding: 3px 0; text-align: right; font-weight: 800;">${lineTotal}</td>
         </tr>
       `;
     }).join('');
@@ -978,7 +978,7 @@ function renderThermalBill(order) {
     </table>
 
     <div style="border-top: 1px dashed #000; padding-top: 4px; font-size: 10px;">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 2px; font-weight: 800;">
         <span>Item Subtotal:</span>
         <span>₹${order.subtotal.toFixed(2)}</span>
       </div>
