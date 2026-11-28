@@ -945,6 +945,15 @@ function renderThermalBill(order) {
     }).join('');
   }
 
+  const uploadedQrUrl = (state.settings.upi_qr_url || '').trim();
+  const upiId = (state.settings.upi_id || '').trim();
+  let qrImgSrc = '';
+  if (uploadedQrUrl) {
+    qrImgSrc = `${uploadedQrUrl}?t=${Date.now()}`;
+  } else if (upiId) {
+    qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent(`upi://pay?pa=${upiId}&pn=${state.settings.restaurant_name || 'Restaurant'}&am=${order.grand_total}&cu=INR`)}`;
+  }
+
   container.innerHTML = `
     <div style="text-align: center; border-bottom: 1px dashed #000; padding-bottom: 6px; margin-bottom: 6px;">
       <h2 style="font-size: 15px; margin: 0; font-weight: bold; text-transform: uppercase;">${state.settings.restaurant_name}</h2>
@@ -1014,12 +1023,14 @@ function renderThermalBill(order) {
       </div>
     </div>
 
-    <!-- Dynamic UPI QR Code for instant payment -->
+    <!-- UPI QR Code (Uploaded Bank QR or Dynamic UPI ID QR) -->
     <div style="text-align: center; margin-top: 10px; border-top: 1px dashed #000; padding-top: 8px;">
-      <div style="font-size: 9px; margin-bottom: 4px;">SCAN QR TO PAY VIA UPI / GPAY / PHONEPE</div>
-      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=upi://pay?pa=${encodeURIComponent(state.settings.upi_id)}%26pn=${encodeURIComponent(state.settings.restaurant_name)}%26am=${order.grand_total}%26cu=INR" 
-           alt="UPI Payment QR" style="width: 90px; height: 90px; margin: 0 auto; display: block;" onerror="this.style.display='none'">
-      <div style="font-size: 9px; font-weight: bold; margin-top: 2px;">UPI ID: ${state.settings.upi_id}</div>
+      ${qrImgSrc ? `
+        <div style="font-size: 9px; margin-bottom: 4px;">SCAN QR TO PAY VIA UPI / GPAY / PHONEPE</div>
+        <img src="${qrImgSrc}"
+             alt="UPI Payment QR" style="width: 100px; height: 100px; object-fit: contain; margin: 0 auto; display: block;" onerror="this.style.display='none'">
+      ` : ''}
+      ${upiId ? `<div style="font-size: 9px; font-weight: bold; margin-top: 2px;">UPI ID: ${upiId}</div>` : ''}
       <div style="font-size: 10px; margin-top: 6px; font-style: italic;">Thank you! Visit us again!</div>
     </div>
   `;
