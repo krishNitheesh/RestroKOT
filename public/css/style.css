@@ -883,20 +883,23 @@ body {
     box-shadow: none !important;
     border: none !important;
     max-width: 100% !important;
-    width: 78mm !important;
+    width: 72mm !important;
     margin: 0 !important;
     padding: 0 !important;
   }
   #thermal-receipt-area {
     position: static !important;
-    width: 78mm !important;
-    margin: 0 !important;
-    padding: 2mm !important;
+    width: 68mm !important;
+    max-width: 68mm !important;
+    box-sizing: border-box !important;
+    margin: 0 auto !important;
+    padding: 1mm 1.5mm !important;
     color: #000 !important;
     background: #fff !important;
     font-family: 'Courier New', Courier, monospace !important;
-    font-size: 11px !important;
+    font-size: 10.5px !important;
     line-height: 1.25 !important;
+    overflow: hidden !important;
   }
   .print-copy-break {
     page-break-after: always;

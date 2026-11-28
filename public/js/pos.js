@@ -1431,29 +1431,43 @@ function printReceiptCopies(copies = 2) {
   const singleHtml = container.dataset.singleCopyHtml || container.innerHTML;
   container.dataset.singleCopyHtml = singleHtml;
 
+  const makeCopyHtml = (label) => `
+    <div>
+      <div style="text-align:center; font-size:9px; font-weight:bold; letter-spacing:1px; margin-bottom:4px;">*** ${label} ***</div>
+      ${singleHtml}
+    </div>
+  `;
+
   if (copies === 2) {
-    container.innerHTML = `
-      <div class="print-copy-break">
-        <div style="text-align:center; font-size:9px; font-weight:bold; letter-spacing:1px; margin-bottom:4px;">*** CUSTOMER COPY ***</div>
-        ${singleHtml}
-      </div>
-      <div>
-        <div style="text-align:center; font-size:9px; font-weight:bold; letter-spacing:1px; margin-bottom:4px;">*** COUNTER COPY ***</div>
-        ${singleHtml}
-      </div>
-    `;
+    // Print as 2 separate print jobs so thermal printer physically cuts between Bill 1 and Bill 2
+    container.innerHTML = makeCopyHtml('CUSTOMER COPY');
+    let secondTriggered = false;
+
+    const handleFirstAfterPrint = () => {
+      window.removeEventListener('afterprint', handleFirstAfterPrint);
+      if (secondTriggered) return;
+      secondTriggered = true;
+
+      container.innerHTML = makeCopyHtml('COUNTER COPY');
+      const handleSecondAfterPrint = () => {
+        window.removeEventListener('afterprint', handleSecondAfterPrint);
+        container.innerHTML = singleHtml;
+      };
+      window.addEventListener('afterprint', handleSecondAfterPrint);
+      setTimeout(() => window.print(), 150);
+    };
+
+    window.addEventListener('afterprint', handleFirstAfterPrint);
+    window.print();
   } else {
-    container.innerHTML = singleHtml;
+    container.innerHTML = makeCopyHtml('CUSTOMER COPY');
+    const restoreSingle = () => {
+      window.removeEventListener('afterprint', restoreSingle);
+      container.innerHTML = singleHtml;
+    };
+    window.addEventListener('afterprint', restoreSingle);
+    window.print();
   }
-
-  window.print();
-
-  // Restore clean single preview after print dialog closes
-  setTimeout(() => {
-    if (container.dataset.singleCopyHtml) {
-      container.innerHTML = container.dataset.singleCopyHtml;
-    }
-  }, 500);
 }
 window.printReceiptCopies = printReceiptCopies;
 
