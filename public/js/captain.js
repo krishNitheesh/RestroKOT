@@ -543,6 +543,15 @@ function updateCartUI() {
   }
 }
 
+function appendCaptainKitchenNote(text) {
+  const el = document.getElementById('captain-kitchen-note');
+  if (!el) return;
+  const cur = el.value.trim();
+  el.value = cur ? `${cur}, ${text}` : text;
+  el.focus();
+}
+window.appendCaptainKitchenNote = appendCaptainKitchenNote;
+
 async function punchCaptainOrder() {
   if (captainState.cart.length === 0 || !captainState.selectedTable) {
     showToast('Add items before punching order', 'warning');
@@ -555,10 +564,14 @@ async function punchCaptainOrder() {
     punchBtn.innerHTML = `<span>⏳ Sending to Kitchen...</span>`;
   }
 
+  const kitchenNoteEl = document.getElementById('captain-kitchen-note');
+  const kitchenNote = kitchenNoteEl ? kitchenNoteEl.value.trim() : '';
+
   const payload = {
     channel: 'dine_in',
     table_name: captainState.selectedTable,
     waiter_name: captainState.captainName,
+    notes: kitchenNote,
     items: captainState.cart.map(i => ({
       item_id: i.id,
       item_name: i.name,
@@ -581,6 +594,7 @@ async function punchCaptainOrder() {
       KotAudio?.playSuccessBeep?.();
       showToast(`🎉 KOT Punched for Table ${captainState.selectedTable}! Kitchen notified.`, 'success');
       captainState.cart = [];
+      if (kitchenNoteEl) kitchenNoteEl.value = '';
       updateCartUI();
       await refreshSelectedTableOrder();
       kotSocket.notifyAction('NEW_ORDER', { table: captainState.selectedTable });

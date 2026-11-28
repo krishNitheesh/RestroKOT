@@ -347,6 +347,20 @@
     <div id="captain-dishes-container">
       <!-- Populated dynamically -->
     </div>
+
+    <!-- Custom Kitchen Note / Special Instruction -->
+    <div style="background: #ffffff; border: 1.5px solid #fed7aa; border-radius: 12px; padding: 0.75rem 0.85rem; margin-top: 0.75rem;">
+      <label for="captain-kitchen-note" style="display: block; font-size: 0.76rem; font-weight: 800; color: #c2410c; text-transform: uppercase; margin-bottom: 0.4rem;">
+        📝 Note for Kitchen (Optional)
+      </label>
+      <input type="text" id="captain-kitchen-note" class="form-input" style="width: 100%; font-size: 0.88rem; padding: 0.55rem 0.75rem; border-radius: 8px; box-sizing: border-box;" placeholder="e.g. Less spicy, No onion/garlic, Extra crispy...">
+      <div style="display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.45rem;">
+        <button type="button" onclick="appendCaptainKitchenNote('Less Spicy')" style="background: #fff7ed; border: 1px solid #fdba74; color: #c2410c; border-radius: 20px; padding: 3px 9px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">+ Less Spicy</button>
+        <button type="button" onclick="appendCaptainKitchenNote('No Onion/Garlic')" style="background: #fff7ed; border: 1px solid #fdba74; color: #c2410c; border-radius: 20px; padding: 3px 9px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">+ No Onion/Garlic</button>
+        <button type="button" onclick="appendCaptainKitchenNote('Extra Spicy')" style="background: #fff7ed; border: 1px solid #fdba74; color: #c2410c; border-radius: 20px; padding: 3px 9px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">+ Extra Spicy</button>
+        <button type="button" onclick="appendCaptainKitchenNote('Parcel')" style="background: #fff7ed; border: 1px solid #fdba74; color: #c2410c; border-radius: 20px; padding: 3px 9px; font-size: 0.72rem; font-weight: 700; cursor: pointer;">+ Parcel</button>
+      </div>
+    </div>
   </main>
 
   <!-- Sticky Bottom Bar for Ordering -->
