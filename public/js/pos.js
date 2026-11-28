@@ -73,6 +73,9 @@ async function initPOS() {
     if (eventData && (eventData.type === 'MENU_UPDATED' || eventData.action === 'MENU_UPDATED')) {
       await loadMenuData();
     }
+    if (eventData && (eventData.type === 'SETTINGS_UPDATED' || eventData.action === 'SETTINGS_UPDATED')) {
+      await loadSettings();
+    }
     await loadActiveOrders();
     await loadTables();
     // If the currently selected table has changes, refresh its active order
