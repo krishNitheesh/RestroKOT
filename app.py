@@ -1859,6 +1859,45 @@ def serve_service_ticket(ticket_id):
     return jsonify({'success': True})
 
 
+@app.route('/api/service/items/<int:item_id>/serve', methods=['POST'])
+@login_required(allowed_roles=['manager', 'service'])
+def serve_service_item(item_id):
+    """Mark an individual dish item OUT (served). Auto-completes ticket if all items are OUT."""
+    conn = db.get_db()
+    item = conn.execute("SELECT * FROM order_items WHERE id = ?", (item_id,)).fetchone()
+    if not item:
+        conn.close()
+        return jsonify({'success': False, 'error': 'Dish item not found'}), 404
+
+    ticket_id = item['kot_ticket_id']
+    order_id = item['order_id']
+
+    with conn:
+        conn.execute("UPDATE order_items SET status = 'served' WHERE id = ?", (item_id,))
+        if ticket_id:
+            remaining = conn.execute(
+                "SELECT COUNT(*) as c FROM order_items WHERE kot_ticket_id = ? AND status != 'served'",
+                (ticket_id,)
+            ).fetchone()['c']
+            if remaining == 0:
+                conn.execute(
+                    "UPDATE kot_tickets SET status = 'served', served_at = datetime('now', 'localtime') WHERE id = ?",
+                    (ticket_id,)
+                )
+        unserved_tickets = conn.execute(
+            "SELECT COUNT(*) as c FROM kot_tickets WHERE order_id = ? AND status != 'served'",
+            (order_id,)
+        ).fetchone()['c']
+        if unserved_tickets == 0:
+            conn.execute(
+                "UPDATE orders SET status = 'served', served_at = datetime('now', 'localtime') WHERE id = ?",
+                (order_id,)
+            )
+    conn.close()
+    event_bus.publish('TICKET_SERVED', {'item_id': item_id, 'ticket_id': ticket_id, 'order_id': order_id})
+    return jsonify({'success': True})
+
+
 # -------------------------------------------------------------
 # SETTLE BILL & VACATE TABLE
 # -------------------------------------------------------------

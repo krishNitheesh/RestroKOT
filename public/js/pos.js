@@ -898,6 +898,7 @@ async function printBillAndSettle() {
       kotSocket.notifyAction('BILL_SETTLED', data.order);
       renderThermalBill(data.order);
       openPrintModal();
+      setTimeout(() => printReceiptCopies(2), 180);
       resetToNewOrder();
       await loadActiveOrders();
       await loadTables();
@@ -933,11 +934,11 @@ function renderThermalBill(order) {
       const lineTotal = (it.price * it.quantity).toFixed(2);
       const roundTag = it.round_number && it.round_number > 1 ? ` (R${it.round_number})` : '';
       return `
-        <tr style="font-size: 11px;">
-          <td style="padding: 3px 0; text-align: left; font-weight: 800;">${it.item_name}${roundTag}</td>
-          <td style="padding: 3px 0; text-align: center; font-weight: 800;">${it.quantity}</td>
-          <td style="padding: 3px 0; text-align: right;">${it.price.toFixed(2)}</td>
-          <td style="padding: 3px 0; text-align: right; font-weight: 800;">${lineTotal}</td>
+        <tr style="font-size: 11.5px; color: #000;">
+          <td style="padding: 3px 0; text-align: left; font-weight: 900;">${it.item_name}${roundTag}</td>
+          <td style="padding: 3px 0; text-align: center; font-weight: 900;">${it.quantity}</td>
+          <td style="padding: 3px 0; text-align: right; font-weight: 700;">${it.price.toFixed(2)}</td>
+          <td style="padding: 3px 0; text-align: right; font-weight: 900;">${lineTotal}</td>
         </tr>
       `;
     }).join('');
@@ -1339,7 +1340,7 @@ function renderDrawerOrders() {
         </div>
         <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
           ${order.channel === 'dine_in' && order.table_name ? `
-            <button class="btn btn-primary btn-sm" onclick="selectTable('${order.table_name}'); closeOrdersDrawer();" title="Add more dishes or edit bill">
+            <button class="btn btn-primary btn-sm" style="background:#2563eb;color:#fff;font-weight:700;border:none;" onclick="selectTable('${order.table_name}'); closeOrdersDrawer();" title="Add more dishes or edit bill">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
               Add Items / Edit
             </button>
@@ -1348,7 +1349,7 @@ function renderDrawerOrders() {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
             Bill
           </button>
-          <button class="btn btn-success btn-sm" onclick="settleSpecificOrder(${order.id})" title="Settle and mark paid">
+          <button class="btn btn-success btn-sm" style="background:#16a34a;color:#fff;font-weight:700;border:none;" onclick="settleSpecificOrder(${order.id})" title="Settle and mark paid">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             Settle
           </button>
@@ -1379,6 +1380,7 @@ async function settleSpecificOrder(orderId) {
       kotSocket.notifyAction('BILL_SETTLED', data.order);
       renderThermalBill(data.order);
       openPrintModal();
+      setTimeout(() => printReceiptCopies(2), 180);
       await loadActiveOrders();
       await loadTables();
       resetToNewOrder();

@@ -101,12 +101,16 @@ function renderColumns() {
       card.className = 'restro-ready-card';
 
       const itemsSummary = (ticket.items || []).map(i => `
-        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem; padding: 4px 0; border-bottom: 1px dashed #f1f5f9;">
-          <div style="display: flex; align-items: center; gap: 0.45rem;">
-            <span style="font-size: 0.78rem; font-weight: 800; background: #0f172a; color: #ffffff; padding: 1px 6px; border-radius: 4px;">${i.quantity}x</span>
-            <span style="font-weight: 700; color: #0f172a;">${i.item_name}</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.92rem; padding: 5px 0; border-bottom: 1px dashed #f1f5f9; gap: 0.5rem;">
+          <div style="display: flex; align-items: center; gap: 0.45rem; flex: 1; min-width: 0;">
+            <span class="food-indicator ${i.food_type || 'veg'}"></span>
+            <span style="font-size: 0.8rem; font-weight: 800; background: #0f172a; color: #ffffff; padding: 1px 6px; border-radius: 4px;">${i.quantity}x</span>
+            <span style="font-weight: 700; color: #0f172a; ${i.status === 'served' ? 'text-decoration: line-through; opacity: 0.55;' : ''}">${i.item_name}</span>
           </div>
-          <span class="food-indicator ${i.food_type || 'veg'}"></span>
+          ${i.status === 'served'
+            ? `<span style="font-size: 0.72rem; font-weight: 800; color: #16a34a; background: #dcfce7; padding: 2px 8px; border-radius: 6px;">OUT ✓</span>`
+            : `<button type="button" onclick="serveDishItem(${i.id})" style="background: #16a34a; color: #fff; border: none; border-radius: 6px; padding: 3px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer;">OUT</button>`
+          }
         </div>
       `).join('');
 
@@ -174,7 +178,15 @@ function renderColumns() {
 
       const startTime = new Date(ticket.approved_at || ticket.created_at).getTime();
       const elapsedSec = Math.max(0, Math.floor((Date.now() - startTime) / 1000));
-      const itemsSummary = (ticket.items || []).map(i => `<strong>${i.quantity}x</strong> ${i.item_name}`).join(', ');
+      const itemsSummary = (ticket.items || []).map(i => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px dashed #e2e8f0; gap: 0.5rem;">
+          <span style="${i.status === 'served' ? 'text-decoration: line-through; opacity: 0.55;' : ''}"><strong>${i.quantity}x</strong> ${i.item_name}</span>
+          ${i.status === 'served'
+            ? `<span style="font-size: 0.7rem; font-weight: 800; color: #16a34a; background: #dcfce7; padding: 2px 7px; border-radius: 6px;">OUT ✓</span>`
+            : `<button type="button" onclick="serveDishItem(${i.id})" style="background: #16a34a; color: #fff; border: none; border-radius: 6px; padding: 2px 9px; font-size: 0.72rem; font-weight: 800; cursor: pointer;">OUT</button>`
+          }
+        </div>
+      `).join('');
       const roundTag = ticket.round_number > 1 ? ` (R${ticket.round_number})` : '';
 
       card.innerHTML = `
@@ -223,6 +235,22 @@ function updateTimers() {
     const span = el.querySelector('span');
     if (span) span.textContent = formatDuration(elapsedSec);
   });
+}
+
+async function serveDishItem(itemId) {
+  try {
+    const res = await fetch(`/api/service/items/${itemId}/serve`, { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      showToast('Dish marked OUT!', 'success');
+      kotSocket.notifyAction('TICKET_SERVED', { item_id: itemId });
+      loadServiceTickets();
+    } else {
+      showToast(data.error || 'Failed to mark dish OUT', 'error');
+    }
+  } catch (e) {
+    showToast('Failed to mark dish OUT', 'error');
+  }
 }
 
 async function serveTicket(ticketId) {
@@ -276,5 +304,6 @@ function setupEventListeners() {
 
 // Global exports
 window.serveTicket = serveTicket;
+window.serveDishItem = serveDishItem;
 
 window.addEventListener('DOMContentLoaded', initService);
