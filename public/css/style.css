@@ -861,7 +861,10 @@ body {
     padding: 0 !important;
     background: #fff !important;
   }
+  body > *:not(#print-modal),
   .restro-container,
+  .drawer-overlay,
+  #orders-drawer,
   .mobile-nav-backdrop,
   .modal-overlay:not(#print-modal),
   #print-modal .modal-header,

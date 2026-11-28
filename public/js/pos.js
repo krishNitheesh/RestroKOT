@@ -896,6 +896,7 @@ async function printBillAndSettle() {
     if (data.success && data.order) {
       showToast(`Bill settled! Table ${targetOrder.table_name || ''} is now vacant.`, 'success');
       kotSocket.notifyAction('BILL_SETTLED', data.order);
+      if (typeof closeOrdersDrawer === 'function') closeOrdersDrawer();
       renderThermalBill(data.order);
       openPrintModal();
       setTimeout(() => printReceiptCopies(2), 180);
@@ -1378,6 +1379,7 @@ async function settleSpecificOrder(orderId) {
     if (data.success) {
       showToast('Bill settled successfully! Table marked vacant.', 'success');
       kotSocket.notifyAction('BILL_SETTLED', data.order);
+      if (typeof closeOrdersDrawer === 'function') closeOrdersDrawer();
       renderThermalBill(data.order);
       openPrintModal();
       setTimeout(() => printReceiptCopies(2), 180);
@@ -1391,6 +1393,7 @@ async function settleSpecificOrder(orderId) {
 }
 
 function viewAndPrintBill(order) {
+  if (typeof closeOrdersDrawer === 'function') closeOrdersDrawer();
   renderThermalBill(order);
   openPrintModal();
 }
